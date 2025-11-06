@@ -2,7 +2,19 @@ import { ref, computed } from 'vue'
 import api from './api.js'
 
 const token = ref(localStorage.getItem('token'))
-const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
+
+// Safely parse user from localStorage
+let userData = null
+try {
+  const storedUser = localStorage.getItem('user')
+  if (storedUser && storedUser !== 'null' && storedUser !== 'undefined') {
+    userData = JSON.parse(storedUser)
+  }
+} catch (error) {
+  console.warn('Error parsing user from localStorage:', error)
+  localStorage.removeItem('user') // Clean up invalid data
+}
+const user = ref(userData)
 
 const authService = {
   // Reactive state
@@ -14,7 +26,10 @@ const authService = {
   async login(credentials) {
     try {
       const response = await api.post('/auth/signin', credentials)
-      const { accessToken, user: userData } = response.data
+      const { accessToken, ...userData } = response.data
+      
+      // Remover tokenType de los datos del usuario
+      delete userData.tokenType
       
       this.setAuthData(accessToken, userData)
       return response.data
@@ -65,10 +80,15 @@ const authService = {
     const storedToken = localStorage.getItem('token')
     const storedUser = localStorage.getItem('user')
     
-    if (storedToken && storedUser) {
-      token.value = storedToken
-      user.value = JSON.parse(storedUser)
-      api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
+    if (storedToken && storedUser && storedUser !== 'null' && storedUser !== 'undefined') {
+      try {
+        token.value = storedToken
+        user.value = JSON.parse(storedUser)
+        api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
+      } catch (error) {
+        console.warn('Error parsing stored user data:', error)
+        this.clearAuthData()
+      }
     } else {
       this.clearAuthData()
     }
@@ -90,14 +110,14 @@ const authService = {
     return this.hasRole('ROLE_ADMIN')
   },
 
-  // Check if user is nutritionist
-  isNutritionist() {
-    return this.hasRole('ROLE_NUTRITIONIST')
+  // Verificar si el usuario es nutriólogo
+  esNutriologo() {
+    return this.hasRole('ROLE_NUTRIOLOGO')
   },
 
-  // Check if user is patient
-  isPatient() {
-    return this.hasRole('ROLE_PATIENT')
+  // Verificar si el usuario es paciente
+  esPaciente() {
+    return this.hasRole('ROLE_PACIENTE')
   }
 }
 

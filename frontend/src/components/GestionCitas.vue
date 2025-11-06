@@ -56,6 +56,21 @@
                 :rules="[v => v > 0 || 'Duración debe ser mayor a 0']"
               ></v-text-field>
 
+              <v-checkbox
+                v-model="nuevaCita.sendEmail"
+                label="Enviar notificación por email al paciente"
+                color="green"
+                hint="Se enviará un email al paciente con los detalles de la cita"
+                persistent-hint
+              >
+                <template v-slot:label>
+                  <span class="d-flex align-center">
+                    <v-icon class="mr-2" size="small">mdi-email-send</v-icon>
+                    Enviar notificación por email al paciente
+                  </span>
+                </template>
+              </v-checkbox>
+
               <v-btn
                 type="submit"
                 color="green"
@@ -203,6 +218,7 @@
 
 <script>
 import api from '@/services/api'
+import { sendAppointmentNotification, initEmailJS } from '@/services/emailService'
 
 export default {
   name: 'GestionCitas',
@@ -217,7 +233,8 @@ export default {
         patientId: null,
         appointmentDate: '',
         appointmentType: 'CONSULTATION',
-        duration: 60
+        duration: 60,
+        sendEmail: true // Nueva opción para enviar email
       },
       tiposCita: [
         { title: 'Consulta', value: 'CONSULTATION' },
@@ -240,6 +257,8 @@ export default {
     }
   },
   mounted() {
+    // Inicializar EmailJS al montar el componente
+    initEmailJS()
     this.cargarDatos()
   },
   methods: {
@@ -285,24 +304,96 @@ export default {
     },
 
     async crearCita() {
-      const form = this.$refs.form
-      const { valid } = await form.validate()
-      
-      if (!valid) return
+      // Validar que todos los campos requeridos estén completos
+      if (!this.nuevaCita.patientId || !this.nuevaCita.appointmentDate || !this.nuevaCita.appointmentType) {
+        this.mostrarError('Por favor complete todos los campos requeridos')
+        return
+      }
 
       this.loading = true
       try {
-        await api.post('/appointments', this.nuevaCita)
+        const response = await api.post('/appointments', this.nuevaCita)
+        const citaCreada = response.data
+        
+        // Enviar notificación por email si la opción está activada
+        if (this.nuevaCita.sendEmail) {
+          // Pasar el objeto completo con todos los datos necesarios
+          await this.enviarNotificacionEmail({
+            ...citaCreada,
+            patientId: this.nuevaCita.patientId // Asegurar que tenemos el patientId
+          })
+        }
         
         this.mostrarExito('Cita creada exitosamente')
         this.limpiarFormulario()
         await this.cargarDatos()
         
       } catch (error) {
-        const message = error.response?.data || 'Error al crear la cita'
+        const message = error.response?.data?.message || 'Error al crear la cita'
         this.mostrarError(message)
       } finally {
         this.loading = false
+      }
+    },
+
+    async enviarNotificacionEmail(cita) {
+      try {
+        // Buscar datos del paciente
+        const paciente = this.pacientes.find(p => p.id === cita.patientId)
+        
+        console.log('Paciente encontrado:', paciente)
+        console.log('Email del paciente:', paciente?.email)
+        
+        if (!paciente || !paciente.email) {
+          console.warn('Paciente sin email, no se puede enviar notificación')
+          console.warn('Datos del paciente:', JSON.stringify(paciente, null, 2))
+          return
+        }
+
+        // Formatear fecha y hora - usar el valor original del formulario
+        const fechaOriginal = this.nuevaCita.appointmentDate // Formato: "2025-11-05T14:30"
+        const fechaCita = new Date(fechaOriginal)
+        
+        console.log('Fecha original del formulario:', fechaOriginal)
+        console.log('Fecha parseada:', fechaCita)
+        
+        const fecha = fechaCita.toLocaleDateString('es-ES', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+        const hora = fechaCita.toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+
+        // Obtener nombre del tipo de cita
+        const tipoCitaObj = this.tiposCita.find(t => t.value === cita.appointmentType)
+        const tipoCita = tipoCitaObj ? tipoCitaObj.title : cita.appointmentType
+
+        // Datos para el email
+        const emailData = {
+          patientName: `${paciente.firstName} ${paciente.lastName}`,
+          patientEmail: paciente.email,
+          appointmentDate: fecha,
+          appointmentTime: hora,
+          appointmentType: tipoCita,
+          nutritionistName: 'Dr. Nutriólogo NutriTrack', // Puedes obtener el nombre real del usuario logueado
+          notes: cita.notes || 'Recuerde llegar 10 minutos antes de su cita'
+        }
+
+        // Enviar email usando EmailJS
+        const resultado = await sendAppointmentNotification(emailData)
+        
+        if (resultado.success) {
+          this.mostrarInfo('✉️ Notificación enviada al paciente por email')
+        } else {
+          console.warn('No se pudo enviar la notificación por email:', resultado.error)
+        }
+      } catch (error) {
+        console.error('Error al enviar notificación:', error)
+        // No mostramos error al usuario para no interrumpir el flujo
       }
     },
 
@@ -330,9 +421,16 @@ export default {
         patientId: null,
         appointmentDate: '',
         appointmentType: 'CONSULTATION',
-        duration: 60
+        duration: 60,
+        sendEmail: true
       }
-      this.$refs.form.reset()
+      
+      // Resetear el formulario de manera segura
+      if (this.$refs.form) {
+        this.$nextTick(() => {
+          this.$refs.form.reset()
+        })
+      }
     },
 
     formatearHora(fecha) {

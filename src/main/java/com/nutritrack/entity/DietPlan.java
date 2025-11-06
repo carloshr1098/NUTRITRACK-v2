@@ -1,6 +1,7 @@
 package com.nutritrack.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class DietPlan {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
+    @JsonBackReference("patient-dietPlans")
     private Patient patient;
     
     @ManyToOne(fetch = FetchType.LAZY)

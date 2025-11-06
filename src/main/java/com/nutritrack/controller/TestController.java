@@ -17,4 +17,9 @@ public class TestController {
     public ResponseEntity<?> testLogin(@RequestBody String body) {
         return ResponseEntity.ok("Received: " + body);
     }
+    
+    @GetMapping("/authenticated")
+    public ResponseEntity<?> authenticatedEndpoint() {
+        return ResponseEntity.ok("Authenticated endpoint working!");
+    }
 }

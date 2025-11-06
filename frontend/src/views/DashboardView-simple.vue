@@ -14,7 +14,7 @@
         <h3 style="color: #007bff; margin: 0 0 15px 0;">📋 Gestión de Pacientes</h3>
         <p style="color: #666; margin-bottom: 15px;">Administrar información de pacientes</p>
         <router-link 
-          to="/nutriologo/pacientes" 
+          to="/nutritionist/patients" 
           style="display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px;"
         >
           Ver Pacientes
@@ -26,7 +26,7 @@
         <h3 style="color: #28a745; margin: 0 0 15px 0;">📅 Gestión de Citas</h3>
         <p style="color: #666; margin-bottom: 15px;">Programar y gestionar citas</p>
         <router-link 
-          to="/nutriologo/citas" 
+          to="/nutritionist/appointments" 
           style="display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 4px;"
         >
           Ver Citas
@@ -38,7 +38,7 @@
         <h3 style="color: #ffc107; margin: 0 0 15px 0;">🍎 Planes Dietéticos</h3>
         <p style="color: #666; margin-bottom: 15px;">Crear y administrar dietas</p>
         <router-link 
-          to="/nutriologo/planes-dieteticos" 
+          to="/nutritionist/diet-plans" 
           style="display: inline-block; padding: 10px 20px; background: #ffc107; color: #212529; text-decoration: none; border-radius: 4px;"
         >
           Ver Planes
@@ -69,7 +69,7 @@ export default {
     }
   },
   mounted() {
-    this.user = authService.currentUser.value
+    this.user = authService.getUser()
     if (!this.user) {
       this.$router.push('/login')
     }

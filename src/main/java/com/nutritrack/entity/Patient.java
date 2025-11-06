@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,6 +60,12 @@ public class Patient {
     @Column(name = "dietary_restrictions", length = 500)
     private String dietaryRestrictions;
     
+    @Column(name = "email")
+    private String email;
+    
+    @Column(name = "phone")
+    private String phone;
+    
     @Column(name = "emergency_contact_name")
     private String emergencyContactName;
     
@@ -71,12 +79,15 @@ public class Patient {
     private LocalDateTime updatedAt;
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("patient-weightEntries")
     private List<WeightEntry> weightEntries = new ArrayList<>();
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("patient-appointments")
     private List<Appointment> appointments = new ArrayList<>();
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("patient-dietPlans")
     private List<DietPlan> dietPlans = new ArrayList<>();
     
     public Patient() {}
@@ -128,6 +139,12 @@ public class Patient {
     
     public String getDietaryRestrictions() { return dietaryRestrictions; }
     public void setDietaryRestrictions(String dietaryRestrictions) { this.dietaryRestrictions = dietaryRestrictions; }
+    
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
     
     public String getEmergencyContactName() { return emergencyContactName; }
     public void setEmergencyContactName(String emergencyContactName) { this.emergencyContactName = emergencyContactName; }

@@ -1,6 +1,8 @@
 package com.nutritrack.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,23 +15,25 @@ public class Appointment {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
+    @JsonBackReference("patient-appointments")
     private Patient patient;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nutritionist_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "roles"})
     private User nutritionist;
     
     @Column(name = "appointment_date")
     private LocalDateTime appointmentDate;
     
     @Column(name = "duration_minutes")
-    private Integer durationMinutes = 60; // Default 1 hour
+    private Integer durationMinutes = 60; // Por defecto 1 hora
     
     @Column(name = "appointment_type")
-    private String appointmentType; // CONSULTATION, FOLLOW_UP, EMERGENCY
+    private String appointmentType; // CONSULTA, SEGUIMIENTO, EMERGENCIA
     
     @Column(name = "status")
-    private String status; // SCHEDULED, COMPLETED, CANCELLED, NO_SHOW
+    private String status; // PROGRAMADA, COMPLETADA, CANCELADA, NO_ASISTIO
     
     @Column(name = "notes", length = 1000)
     private String notes;

@@ -13,6 +13,7 @@ import AdminReportsView from '../views/admin/AdminReportsView.vue'
 import NutritionistPatientsView from '../views/nutritionist/NutritionistPatientsView.vue'
 import NutritionistAppointmentsView from '../views/nutritionist/NutritionistAppointmentsView.vue'
 import NutritionistDietPlansView from '../views/nutritionist/NutritionistDietPlansView.vue'
+import PatientDetailView from '../views/nutritionist/PatientDetailView.vue'
 
 // Patient views
 import PatientProfileView from '../views/patient/PatientProfileView.vue'
@@ -46,49 +47,55 @@ const routes = [
     component: AdminReportsView,
     meta: { requiresAuth: true, roles: ['ROLE_ADMIN'] }
   },
-  // Nutritionist routes
+  // Rutas del Nutriólogo
   {
-    path: '/nutritionist/patients',
-    name: 'NutritionistPatients',
+    path: '/nutriologo/pacientes',
+    name: 'NutriologoPacientes',
     component: NutritionistPatientsView,
-    meta: { requiresAuth: true, roles: ['ROLE_NUTRITIONIST', 'ROLE_ADMIN'] }
+    meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
   },
   {
-    path: '/nutritionist/appointments',
-    name: 'NutritionistAppointments',
+    path: '/nutriologo/pacientes/:id',
+    name: 'PacienteDetalle',
+    component: PatientDetailView,
+    meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
+  },
+  {
+    path: '/nutriologo/citas',
+    name: 'NutriologoCitas',
     component: NutritionistAppointmentsView,
-    meta: { requiresAuth: true, roles: ['ROLE_NUTRITIONIST', 'ROLE_ADMIN'] }
+    meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
   },
   {
-    path: '/nutritionist/diet-plans',
-    name: 'NutritionistDietPlans',
+    path: '/nutriologo/planes-dieteticos',
+    name: 'NutriologoPlanesD',
     component: NutritionistDietPlansView,
-    meta: { requiresAuth: true, roles: ['ROLE_NUTRITIONIST', 'ROLE_ADMIN'] }
+    meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
   },
-  // Patient routes
+  // Rutas del Paciente
   {
-    path: '/patient/profile',
-    name: 'PatientProfile',
+    path: '/paciente/perfil',
+    name: 'PacientePerfil',
     component: PatientProfileView,
-    meta: { requiresAuth: true, roles: ['ROLE_PATIENT'] }
+    meta: { requiresAuth: true, roles: ['ROLE_PACIENTE'] }
   },
   {
-    path: '/patient/appointments',
-    name: 'PatientAppointments',
+    path: '/paciente/citas',
+    name: 'PacienteCitas',
     component: PatientAppointmentsView,
-    meta: { requiresAuth: true, roles: ['ROLE_PATIENT'] }
+    meta: { requiresAuth: true, roles: ['ROLE_PACIENTE'] }
   },
   {
-    path: '/patient/diet-plan',
-    name: 'PatientDietPlan',
+    path: '/paciente/plan-dietetico',
+    name: 'PacientePlanDiet',
     component: PatientDietPlanView,
-    meta: { requiresAuth: true, roles: ['ROLE_PATIENT'] }
+    meta: { requiresAuth: true, roles: ['ROLE_PACIENTE'] }
   },
   {
-    path: '/patient/weight-tracking',
-    name: 'PatientWeightTracking',
+    path: '/paciente/control-peso',
+    name: 'PacienteControlPeso',
     component: PatientWeightTrackingView,
-    meta: { requiresAuth: true, roles: ['ROLE_PATIENT'] }
+    meta: { requiresAuth: true, roles: ['ROLE_PACIENTE'] }
   },
   // Catch all route - redirect to dashboard
   {

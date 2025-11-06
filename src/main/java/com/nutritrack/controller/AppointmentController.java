@@ -32,15 +32,15 @@ public class AppointmentController {
 
     // Obtener todas las citas del nutriólogo autenticado
     @GetMapping
-    @PreAuthorize("hasRole('NUTRITIONIST') or hasRole('ADMIN')")
-    public ResponseEntity<?> getMyAppointments(Authentication authentication) {
+    @PreAuthorize("hasRole('ROLE_NUTRIOLOGO') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> obtenerMisCitas(Authentication authentication) {
         try {
-            String username = authentication.getName();
-            User nutritionist = userRepository.findByUsername(username)
+            String nombreUsuario = authentication.getName();
+            User nutriologo = userRepository.findByUsername(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Nutriólogo no encontrado"));
 
-            List<Appointment> appointments = appointmentRepository.findByNutritionistId(nutritionist.getId());
-            return ResponseEntity.ok(appointments);
+            List<Appointment> citas = appointmentRepository.findByNutritionist(nutriologo);
+            return ResponseEntity.ok(citas);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al obtener citas: " + e.getMessage());
         }
@@ -48,20 +48,20 @@ public class AppointmentController {
 
     // Obtener citas del día actual
     @GetMapping("/today")
-    @PreAuthorize("hasRole('NUTRITIONIST') or hasRole('ADMIN')")
-    public ResponseEntity<?> getTodayAppointments(Authentication authentication) {
+    @PreAuthorize("hasRole('ROLE_NUTRIOLOGO') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> obtenerCitasHoy(Authentication authentication) {
         try {
-            String username = authentication.getName();
-            User nutritionist = userRepository.findByUsername(username)
+            String nombreUsuario = authentication.getName();
+            User nutriologo = userRepository.findByUsername(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Nutriólogo no encontrado"));
 
-            LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
-            LocalDateTime endOfDay = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
+            LocalDateTime inicioDia = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime finDia = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
 
-            List<Appointment> appointments = appointmentRepository
-                .findByNutritionistIdAndAppointmentDateBetween(nutritionist.getId(), startOfDay, endOfDay);
+            List<Appointment> citasHoy = appointmentRepository
+                .findByNutritionistAndAppointmentDateBetween(nutriologo, inicioDia, finDia);
             
-            return ResponseEntity.ok(appointments);
+            return ResponseEntity.ok(citasHoy);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al obtener citas del día: " + e.getMessage());
         }
@@ -69,56 +69,56 @@ public class AppointmentController {
 
     // Crear nueva cita
     @PostMapping
-    @PreAuthorize("hasRole('NUTRITIONIST') or hasRole('ADMIN')")
-    public ResponseEntity<?> createAppointment(@RequestBody Map<String, Object> request, Authentication authentication) {
+    @PreAuthorize("hasRole('ROLE_NUTRIOLOGO') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> crearCita(@RequestBody Map<String, Object> solicitud, Authentication authentication) {
         try {
-            String username = authentication.getName();
-            User nutritionist = userRepository.findByUsername(username)
+            String nombreUsuario = authentication.getName();
+            User nutriologo = userRepository.findByUsername(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Nutriólogo no encontrado"));
 
             // Obtener datos de la solicitud
-            Long patientId = Long.valueOf(request.get("patientId").toString());
-            String appointmentDateStr = request.get("appointmentDate").toString();
-            String appointmentType = request.get("appointmentType").toString();
-            Integer duration = request.containsKey("duration") ? 
-                Integer.valueOf(request.get("duration").toString()) : 60;
+            Long idPaciente = Long.valueOf(solicitud.get("patientId").toString());
+            String fechaCitaStr = solicitud.get("appointmentDate").toString();
+            String tipoCita = solicitud.get("appointmentType").toString();
+            Integer duracion = solicitud.containsKey("duration") ? 
+                Integer.valueOf(solicitud.get("duration").toString()) : 60;
 
             // Buscar el paciente
-            Patient patient = patientRepository.findById(patientId)
+            Patient paciente = patientRepository.findById(idPaciente)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
 
             // Parsear fecha
-            LocalDateTime appointmentDate = LocalDateTime.parse(appointmentDateStr);
+            LocalDateTime fechaCita = LocalDateTime.parse(fechaCitaStr);
 
             // Verificar disponibilidad (no debe haber otra cita en el mismo horario)
-            LocalDateTime endTime = appointmentDate.plusMinutes(duration);
-            List<Appointment> conflictingAppts = appointmentRepository
-                .findByNutritionistIdAndAppointmentDateBetween(
-                    nutritionist.getId(), 
-                    appointmentDate.minusMinutes(duration), 
-                    endTime
+            LocalDateTime horaFin = fechaCita.plusMinutes(duracion);
+            List<Appointment> citasConflicto = appointmentRepository
+                .findByNutritionistAndAppointmentDateBetween(
+                    nutriologo, 
+                    fechaCita.minusMinutes(duracion), 
+                    horaFin
                 );
 
-            if (!conflictingAppts.isEmpty()) {
+            if (!citasConflicto.isEmpty()) {
                 return ResponseEntity.badRequest()
                     .body("Ya existe una cita programada en ese horario");
             }
 
             // Crear nueva cita
-            Appointment appointment = new Appointment();
-            appointment.setPatient(patient);
-            appointment.setNutritionist(nutritionist);
-            appointment.setAppointmentDate(appointmentDate);
-            appointment.setDurationMinutes(duration);
-            appointment.setAppointmentType(appointmentType);
-            appointment.setStatus("SCHEDULED");
+            Appointment cita = new Appointment();
+            cita.setPatient(paciente);
+            cita.setNutritionist(nutriologo);
+            cita.setAppointmentDate(fechaCita);
+            cita.setDurationMinutes(duracion);
+            cita.setAppointmentType(tipoCita);
+            cita.setStatus("SCHEDULED");
 
             // Guardar
-            Appointment savedAppointment = appointmentRepository.save(appointment);
+            Appointment citaGuardada = appointmentRepository.save(cita);
             
             return ResponseEntity.ok(Map.of(
                 "message", "Cita creada exitosamente",
-                "appointment", savedAppointment
+                "appointment", citaGuardada
             ));
 
         } catch (Exception e) {
@@ -129,11 +129,11 @@ public class AppointmentController {
 
     // Obtener todos los pacientes para el selector
     @GetMapping("/patients")
-    @PreAuthorize("hasRole('NUTRITIONIST') or hasRole('ADMIN')")
-    public ResponseEntity<?> getPatients() {
+    @PreAuthorize("hasRole('ROLE_NUTRIOLOGO') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> obtenerPacientes() {
         try {
-            List<Patient> patients = patientRepository.findAll();
-            return ResponseEntity.ok(patients);
+            List<Patient> pacientes = patientRepository.findAll();
+            return ResponseEntity.ok(pacientes);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al obtener pacientes: " + e.getMessage());
         }
@@ -141,41 +141,41 @@ public class AppointmentController {
 
     // Actualizar cita
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('NUTRITIONIST') or hasRole('ADMIN')")
-    public ResponseEntity<?> updateAppointment(@PathVariable Long id, 
-                                              @RequestBody Map<String, Object> request,
+    @PreAuthorize("hasRole('ROLE_NUTRIOLOGO') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> actualizarCita(@PathVariable Long id, 
+                                              @RequestBody Map<String, Object> solicitud,
                                               Authentication authentication) {
         try {
-            String username = authentication.getName();
-            User nutritionist = userRepository.findByUsername(username)
+            String nombreUsuario = authentication.getName();
+            User nutriologo = userRepository.findByUsername(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Nutriólogo no encontrado"));
 
-            Appointment appointment = appointmentRepository.findById(id)
+            Appointment cita = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
             // Verificar que la cita pertenece al nutriólogo autenticado
-            if (!appointment.getNutritionist().getId().equals(nutritionist.getId())) {
+            if (!cita.getNutritionist().getId().equals(nutriologo.getId())) {
                 return ResponseEntity.status(403).body("No tiene permisos para modificar esta cita");
             }
 
             // Actualizar campos si están presentes
-            if (request.containsKey("appointmentDate")) {
-                appointment.setAppointmentDate(LocalDateTime.parse(request.get("appointmentDate").toString()));
+            if (solicitud.containsKey("appointmentDate")) {
+                cita.setAppointmentDate(LocalDateTime.parse(solicitud.get("appointmentDate").toString()));
             }
-            if (request.containsKey("status")) {
-                appointment.setStatus(request.get("status").toString());
+            if (solicitud.containsKey("status")) {
+                cita.setStatus(solicitud.get("status").toString());
             }
-            if (request.containsKey("appointmentType")) {
-                appointment.setAppointmentType(request.get("appointmentType").toString());
+            if (solicitud.containsKey("appointmentType")) {
+                cita.setAppointmentType(solicitud.get("appointmentType").toString());
             }
-            if (request.containsKey("notes")) {
-                appointment.setNotes(request.get("notes").toString());
+            if (solicitud.containsKey("notes")) {
+                cita.setNotes(solicitud.get("notes").toString());
             }
 
-            Appointment savedAppointment = appointmentRepository.save(appointment);
+            Appointment citaGuardada = appointmentRepository.save(cita);
             return ResponseEntity.ok(Map.of(
                 "message", "Cita actualizada exitosamente",
-                "appointment", savedAppointment
+                "appointment", citaGuardada
             ));
 
         } catch (Exception e) {
@@ -185,23 +185,23 @@ public class AppointmentController {
 
     // Cancelar cita
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('NUTRITIONIST') or hasRole('ADMIN')")
-    public ResponseEntity<?> cancelAppointment(@PathVariable Long id, Authentication authentication) {
+    @PreAuthorize("hasRole('ROLE_NUTRIOLOGO') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> cancelarCita(@PathVariable Long id, Authentication authentication) {
         try {
-            String username = authentication.getName();
-            User nutritionist = userRepository.findByUsername(username)
+            String nombreUsuario = authentication.getName();
+            User nutriologo = userRepository.findByUsername(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Nutriólogo no encontrado"));
 
-            Appointment appointment = appointmentRepository.findById(id)
+            Appointment cita = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
             // Verificar permisos
-            if (!appointment.getNutritionist().getId().equals(nutritionist.getId())) {
+            if (!cita.getNutritionist().getId().equals(nutriologo.getId())) {
                 return ResponseEntity.status(403).body("No tiene permisos para cancelar esta cita");
             }
 
-            appointment.setStatus("CANCELLED");
-            appointmentRepository.save(appointment);
+            cita.setStatus("CANCELLED");
+            appointmentRepository.save(cita);
 
             return ResponseEntity.ok(Map.of("message", "Cita cancelada exitosamente"));
 

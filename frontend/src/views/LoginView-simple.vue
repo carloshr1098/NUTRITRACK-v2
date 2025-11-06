@@ -69,10 +69,11 @@ export default {
       this.error = null
       
       try {
-        const response = await authService.login(this.form)
+        const response = await authService.login(this.form.username, this.form.password)
         
-        if (response && response.accessToken) {
-          // El servicio ya maneja el token y usuario internamente
+        if (response && response.token) {
+          authService.saveToken(response.token)
+          authService.saveUser(response)
           this.$router.push('/dashboard')
         } else {
           this.error = 'Credenciales inválidas'
