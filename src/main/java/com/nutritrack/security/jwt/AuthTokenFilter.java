@@ -31,6 +31,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                                   FilterChain filterChain) throws ServletException, IOException {
         // Skip JWT validation for auth endpoints
         String path = request.getRequestURI();
+        String method = request.getMethod();
+        
+        logger.debug("Processing request: {} {}", method, path);
+        
         if (path.startsWith("/api/auth/") || path.startsWith("/h2-console")) {
             filterChain.doFilter(request, response);
             return;
@@ -38,7 +42,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             
         try {
             String jwt = parseJwt(request);
-            logger.debug("Path: {}, JWT: {}", path, jwt != null ? "Present" : "Absent");
+            logger.debug("Path: {}, Method: {}, JWT: {}", path, method, jwt != null ? "Present" : "Absent");
             
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
@@ -51,12 +55,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                logger.debug("Authentication set for user: {}", username);
+                logger.debug("Authentication set for user: {} with authorities: {}", username, userDetails.getAuthorities());
             } else {
-                logger.debug("JWT validation failed or JWT is null");
+                logger.warn("JWT validation failed or JWT is null for {} {}", method, path);
             }
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
+            logger.error("Cannot set user authentication for {} {}: {}", method, path, e.getMessage());
         }
 
         filterChain.doFilter(request, response);

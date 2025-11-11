@@ -1,7 +1,7 @@
 package com.nutritrack.entity;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,19 +9,21 @@ import java.util.List;
 
 @Entity
 @Table(name = "diet_plans")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DietPlan {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "patient_id")
-    @JsonBackReference("patient-dietPlans")
+    @JsonIgnoreProperties({"appointments", "dietPlans", "weightEntries", "hibernateLazyInitializer", "handler"})
     private Patient patient;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "nutritionist_id")
+    @JsonIgnoreProperties({"password", "roles", "hibernateLazyInitializer", "handler"})
     private User nutritionist;
     
     @Column(name = "plan_name")
@@ -51,7 +53,8 @@ public class DietPlan {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    @OneToMany(mappedBy = "dietPlan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "dietPlan", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({"dietPlan", "hibernateLazyInitializer", "handler"})
     private List<DietMeal> meals = new ArrayList<>();
     
     public DietPlan() {}

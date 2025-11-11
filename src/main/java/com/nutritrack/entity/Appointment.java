@@ -15,7 +15,7 @@ public class Appointment {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
-    @JsonBackReference("patient-appointments")
+    @JsonIgnoreProperties({"appointments", "dietPlans", "weightEntries", "hibernateLazyInitializer", "handler"})
     private Patient patient;
     
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,7 +33,7 @@ public class Appointment {
     private String appointmentType; // CONSULTA, SEGUIMIENTO, EMERGENCIA
     
     @Column(name = "status")
-    private String status; // PROGRAMADA, COMPLETADA, CANCELADA, NO_ASISTIO
+    private String status; // PROGRAMADA, COMPLETADA, CANCELADA, NO_ASISTIO, ATENDIDO
     
     @Column(name = "notes", length = 1000)
     private String notes;

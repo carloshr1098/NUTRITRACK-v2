@@ -15,6 +15,8 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+    } else {
+      console.warn('⚠️ No hay token en localStorage para:', config.method?.toUpperCase(), config.url)
     }
     return config
   },
@@ -29,11 +31,9 @@ api.interceptors.response.use(
     return response
   },
   (error) => {
+    // Solo loguear el error, no redirigir automáticamente
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      window.location.href = '/login'
+      console.error('❌ Error 401 - No autorizado:', error.config?.url)
     }
     return Promise.reject(error)
   }

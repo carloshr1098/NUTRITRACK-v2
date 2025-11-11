@@ -13,6 +13,7 @@ import AdminReportsView from '../views/admin/AdminReportsView.vue'
 import NutritionistPatientsView from '../views/nutritionist/NutritionistPatientsView.vue'
 import NutritionistAppointmentsView from '../views/nutritionist/NutritionistAppointmentsView.vue'
 import NutritionistDietPlansView from '../views/nutritionist/NutritionistDietPlansView.vue'
+import NutritionistFoodsView from '../views/nutritionist/NutritionistFoodsView.vue'
 import PatientDetailView from '../views/nutritionist/PatientDetailView.vue'
 
 // Patient views
@@ -48,6 +49,12 @@ const routes = [
     meta: { requiresAuth: true, roles: ['ROLE_ADMIN'] }
   },
   // Rutas del Nutriólogo
+  // {
+  //   path: '/nutricionista/dashboard',
+  //   name: 'NutricionistaDashboard',
+  //   component: NutritionistDashboardView,
+  //   meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
+  // },
   {
     path: '/nutriologo/pacientes',
     name: 'NutriologoPacientes',
@@ -70,6 +77,12 @@ const routes = [
     path: '/nutriologo/planes-dieteticos',
     name: 'NutriologoPlanesD',
     component: NutritionistDietPlansView,
+    meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
+  },
+  {
+    path: '/nutriologo/alimentos',
+    name: 'NutriologoAlimentos',
+    component: NutritionistFoodsView,
     meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
   },
   // Rutas del Paciente

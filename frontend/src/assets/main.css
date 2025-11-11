@@ -1,4 +1,16 @@
-/* color palette from <https://github.com/vuetifyjs/vuetify/blob/dev/packages/vuetify/src/styles/settings/_colors.scss> */
+/* NutriTrack Brand Colors */
+:root {
+  --nutritrack-green: #2A071FF;
+  --nutritrack-sky-blue: #FF01FF;
+  --nutritrack-red: #FF0000;
+  --nutritrack-navy: #7A7A5A;
+  
+  /* Extended palette */
+  --nutritrack-green-light: #B8D438;
+  --nutritrack-green-dark: #1F5A0F;
+  --nutritrack-sky-blue-light: #B3E5FC;
+  --nutritrack-navy-dark: #1B3A52;
+}
 
 * {
   box-sizing: border-box;

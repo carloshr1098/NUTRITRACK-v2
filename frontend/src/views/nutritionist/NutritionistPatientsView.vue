@@ -49,6 +49,7 @@
                 v-model="nuevoPaciente.primerNombre" 
                 type="text" 
                 required
+                @blur="nuevoPaciente.primerNombre = capitalizarNombre(nuevoPaciente.primerNombre)"
                 style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
               >
             </div>
@@ -58,6 +59,7 @@
                 v-model="nuevoPaciente.primerApellido" 
                 type="text" 
                 required
+                @blur="nuevoPaciente.primerApellido = capitalizarNombre(nuevoPaciente.primerApellido)"
                 style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
               >
             </div>
@@ -89,7 +91,9 @@
                 v-model.number="nuevoPaciente.altura" 
                 type="number" 
                 step="0.01"
+                min="0"
                 required
+                @keypress="soloNumeros"
                 style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
               >
             </div>
@@ -99,7 +103,9 @@
                 v-model.number="nuevoPaciente.pesoActual" 
                 type="number" 
                 step="0.01"
+                min="0"
                 required
+                @keypress="soloNumeros"
                 style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
               >
             </div>
@@ -116,6 +122,9 @@
               <input 
                 v-model="nuevoPaciente.telefono" 
                 type="tel" 
+                maxlength="10"
+                @keypress="soloNumerosEnteros"
+                placeholder="10 dígitos"
                 style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
               >
             </div>
@@ -161,7 +170,8 @@
               <label style="display: block; margin-bottom: 5px; font-weight: bold;">Contacto de Emergencia - Nombre</label>
               <input 
                 v-model="nuevoPaciente.contactoEmergenciaNombre" 
-                type="text" 
+                type="text"
+                @blur="nuevoPaciente.contactoEmergenciaNombre = capitalizarNombre(nuevoPaciente.contactoEmergenciaNombre)"
                 style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
               >
             </div>
@@ -169,7 +179,10 @@
               <label style="display: block; margin-bottom: 5px; font-weight: bold;">Contacto de Emergencia - Teléfono</label>
               <input 
                 v-model="nuevoPaciente.contactoEmergenciaTelefono" 
-                type="tel" 
+                type="tel"
+                maxlength="10"
+                @keypress="soloNumerosEnteros"
+                placeholder="10 dígitos"
                 style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
               >
             </div>
@@ -361,13 +374,15 @@ export default {
     }
   },
   mounted() {
+    // Cargar pacientes automáticamente al entrar
+    this.cargarPacientes()
+    
     // Verificar si hay un paciente pendiente de editar
     const editarPacienteId = localStorage.getItem('editarPacienteId')
     if (editarPacienteId) {
       localStorage.removeItem('editarPacienteId')
-      // Cargar pacientes primero
-      this.cargarPacientes().then(() => {
-        // Buscar el paciente en la lista cargada
+      // Esperar a que carguen los pacientes y luego buscar el que se va a editar
+      this.$nextTick(() => {
         const paciente = this.pacientes.find(p => p.id === parseInt(editarPacienteId))
         if (paciente) {
           this.editarPaciente(paciente)
@@ -400,6 +415,45 @@ export default {
         this.guardando = true
         this.errorCreacion = null
         this.exitoCreacion = false
+        
+        // Validaciones adicionales
+        if (this.nuevoPaciente.altura && this.nuevoPaciente.altura < 0) {
+          this.errorCreacion = 'La altura no puede ser negativa'
+          this.guardando = false
+          return
+        }
+        
+        if (this.nuevoPaciente.pesoActual && this.nuevoPaciente.pesoActual < 0) {
+          this.errorCreacion = 'El peso no puede ser negativo'
+          this.guardando = false
+          return
+        }
+        
+        if (this.nuevoPaciente.telefono && this.nuevoPaciente.telefono.length !== 10) {
+          this.errorCreacion = 'El teléfono debe tener exactamente 10 dígitos'
+          this.guardando = false
+          return
+        }
+        
+        if (this.nuevoPaciente.telefono && !/^\d+$/.test(this.nuevoPaciente.telefono)) {
+          this.errorCreacion = 'El teléfono solo debe contener números'
+          this.guardando = false
+          return
+        }
+        
+        // Validar teléfono de emergencia
+        if (this.nuevoPaciente.contactoEmergenciaTelefono) {
+          if (this.nuevoPaciente.contactoEmergenciaTelefono.length !== 10) {
+            this.errorCreacion = 'El teléfono de emergencia debe tener exactamente 10 dígitos'
+            this.guardando = false
+            return
+          }
+          if (!/^\d+$/.test(this.nuevoPaciente.contactoEmergenciaTelefono)) {
+            this.errorCreacion = 'El teléfono de emergencia solo debe contener números'
+            this.guardando = false
+            return
+          }
+        }
         
         // Convertir nombres de campos de español a inglés
         const datosCreacion = {
@@ -569,6 +623,33 @@ export default {
     // Método para ver detalle (navegación)
     verDetalle(pacienteId) {
       this.$router.push(`/nutriologo/pacientes/${pacienteId}`)
+    },
+    
+    // Métodos de validación
+    soloNumeros(event) {
+      const char = String.fromCharCode(event.keyCode)
+      // Permitir números, punto decimal y teclas de control
+      if (!/[0-9.]/.test(char) && event.keyCode !== 8 && event.keyCode !== 46) {
+        event.preventDefault()
+      }
+    },
+    
+    soloNumerosEnteros(event) {
+      const char = String.fromCharCode(event.keyCode)
+      // Solo permitir números (0-9)
+      if (!/[0-9]/.test(char)) {
+        event.preventDefault()
+      }
+    },
+
+    capitalizarNombre(texto) {
+      if (!texto) return ''
+      // Convertir todo a minúsculas primero
+      texto = texto.toLowerCase()
+      // Capitalizar la primera letra de cada palabra
+      return texto.split(' ')
+        .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+        .join(' ')
     }
   }
 }

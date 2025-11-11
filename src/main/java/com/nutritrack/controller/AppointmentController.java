@@ -158,15 +158,32 @@ public class AppointmentController {
                 return ResponseEntity.status(403).body("No tiene permisos para modificar esta cita");
             }
 
+            // Actualizar paciente si se proporciona
+            if (solicitud.containsKey("patientId")) {
+                Long idPaciente = Long.valueOf(solicitud.get("patientId").toString());
+                Patient paciente = patientRepository.findById(idPaciente)
+                    .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+                cita.setPatient(paciente);
+            }
+
             // Actualizar campos si están presentes
             if (solicitud.containsKey("appointmentDate")) {
-                cita.setAppointmentDate(LocalDateTime.parse(solicitud.get("appointmentDate").toString()));
+                String fechaStr = solicitud.get("appointmentDate").toString();
+                // Manejar formato ISO 8601 con zona horaria
+                if (fechaStr.contains("Z") || fechaStr.contains("+")) {
+                    cita.setAppointmentDate(java.time.ZonedDateTime.parse(fechaStr).toLocalDateTime());
+                } else {
+                    cita.setAppointmentDate(LocalDateTime.parse(fechaStr));
+                }
             }
             if (solicitud.containsKey("status")) {
                 cita.setStatus(solicitud.get("status").toString());
             }
             if (solicitud.containsKey("appointmentType")) {
                 cita.setAppointmentType(solicitud.get("appointmentType").toString());
+            }
+            if (solicitud.containsKey("durationMinutes")) {
+                cita.setDurationMinutes(Integer.valueOf(solicitud.get("durationMinutes").toString()));
             }
             if (solicitud.containsKey("notes")) {
                 cita.setNotes(solicitud.get("notes").toString());
@@ -183,10 +200,10 @@ public class AppointmentController {
         }
     }
 
-    // Cancelar cita
+    // Eliminar cita permanentemente
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_NUTRIOLOGO') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> cancelarCita(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<?> eliminarCita(@PathVariable Long id, Authentication authentication) {
         try {
             String nombreUsuario = authentication.getName();
             User nutriologo = userRepository.findByUsername(nombreUsuario)
@@ -197,16 +214,16 @@ public class AppointmentController {
 
             // Verificar permisos
             if (!cita.getNutritionist().getId().equals(nutriologo.getId())) {
-                return ResponseEntity.status(403).body("No tiene permisos para cancelar esta cita");
+                return ResponseEntity.status(403).body("No tiene permisos para eliminar esta cita");
             }
 
-            cita.setStatus("CANCELLED");
-            appointmentRepository.save(cita);
+            // Eliminar permanentemente
+            appointmentRepository.delete(cita);
 
-            return ResponseEntity.ok(Map.of("message", "Cita cancelada exitosamente"));
+            return ResponseEntity.ok(Map.of("message", "Cita eliminada exitosamente"));
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al cancelar cita: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error al eliminar cita: " + e.getMessage());
         }
     }
 }

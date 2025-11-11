@@ -8,13 +8,13 @@ import '@mdi/font/css/materialdesignicons.css'
 const lightTheme = {
   dark: false,
   colors: {
-    primary: '#2E7D32',
-    secondary: '#388E3C',
-    accent: '#4CAF50',
-    error: '#F44336',
+    primary: '#8BC34A',      // Verde más cercano a VIBREO110
+    secondary: '#5FC3E4',    // Sky Blue
+    accent: '#8BC34A',       
+    error: '#E74C3C',        // Rojo
     warning: '#FF9800',
-    info: '#2196F3',
-    success: '#4CAF50',
+    info: '#5FC3E4',         
+    success: '#8BC34A',      
     background: '#F5F5F5',
     surface: '#FFFFFF'
   }
@@ -23,15 +23,15 @@ const lightTheme = {
 const darkTheme = {
   dark: true,
   colors: {
-    primary: '#4CAF50',
-    secondary: '#66BB6A',
-    accent: '#81C784',
-    error: '#CF6679',
+    primary: '#8BC34A',
+    secondary: '#5FC3E4',
+    accent: '#8BC34A',
+    error: '#E74C3C',
     warning: '#FFB74D',
-    info: '#64B5F6',
-    success: '#81C784',
-    background: '#121212',
-    surface: '#1E1E1E'
+    info: '#5FC3E4',
+    success: '#8BC34A',
+    background: '#1A1A2E',   // Navy oscuro
+    surface: '#16213E'
   }
 }
 

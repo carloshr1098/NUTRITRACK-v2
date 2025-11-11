@@ -6,7 +6,7 @@ Este documento describe las tres librerías/APIs implementadas en el proyecto Nu
 
 ---
 
-## 1. 📄 jsPDF - Generación de Documentos PDF
+## 1. jsPDF - Generación de Documentos PDF
 
 ### Descripción
 jsPDF es una librería JavaScript de código abierto que permite generar documentos PDF directamente desde el navegador sin necesidad de procesamiento en el servidor.
@@ -52,21 +52,15 @@ const generarPDF = () => {
 ```
 
 **Funcionalidades implementadas:**
-- ✅ Generación de expediente médico completo
-- ✅ Inclusión de datos personales y médicos
-- ✅ Historial de peso y citas
-- ✅ Planes dietéticos activos
-- ✅ Formato profesional con encabezados y secciones
-- ✅ Descarga automática al navegador
+- Generación de expediente médico completo
+- Inclusión de datos personales y médicos
+- Historial de peso y citas
+- Planes dietéticos activos
+- Formato profesional con encabezados y secciones
+- Descarga automática al navegador
 
-### Capturas de Pantalla
-- Botón "Generar PDF" en vista de detalles del paciente
-- PDF generado con información completa
-- Diseño profesional del documento
 
----
-
-## 2. 📊 Chart.js - Visualización de Datos
+## 2. Chart.js - Visualización de Datos
 
 ### Descripción
 Chart.js es una librería JavaScript de código abierto para crear gráficas interactivas y responsivas en HTML5 Canvas. Es una de las librerías de visualización más populares y fáciles de usar.
@@ -150,13 +144,13 @@ export default {
 ```
 
 **Funcionalidades implementadas:**
-- ✅ API REST para gestionar registros de peso (GET, POST, DELETE)
-- ✅ Gráfica de línea mostrando evolución temporal del peso
-- ✅ Formulario para registrar nuevos pesos con fecha y notas
-- ✅ Tabla detallada con diferencias entre pesajes (▲/▼)
-- ✅ Actualización automática del peso actual del paciente
-- ✅ Interfaz responsiva y visualmente atractiva
-- ✅ Gráfica interactiva con tooltips
+- API REST para gestionar registros de peso (GET, POST, DELETE)
+- Gráfica de línea mostrando evolución temporal del peso
+- Formulario para registrar nuevos pesos con fecha y notas
+- Tabla detallada con diferencias entre pesajes (▲/▼)
+- Actualización automática del peso actual del paciente
+- Interfaz responsiva y visualmente atractiva
+- Gráfica interactiva con tooltips
 
 ### Base de Datos
 Tabla `weight_records`:
@@ -166,15 +160,10 @@ Tabla `weight_records`:
 - `record_date` (DATE)
 - `notes` (VARCHAR)
 
-### Capturas de Pantalla
-- Sección "📊 Historial de Peso" en detalles del paciente
-- Formulario de registro de peso
-- Gráfica de línea con evolución temporal
-- Tabla con historial completo y diferencias
 
 ---
 
-## 3. 📧 EmailJS - Envío de Notificaciones por Email
+## 3. EmailJS - Envío de Notificaciones por Email
 
 ### Descripción
 EmailJS es una librería JavaScript que permite enviar emails directamente desde el navegador sin necesidad de un servidor backend. Utiliza servicios de email populares como Gmail, Outlook, Yahoo, etc., mediante su API.
@@ -263,13 +252,13 @@ async crearCita() {
 ```
 
 **Funcionalidades implementadas:**
-- ✅ Servicio de envío de emails con EmailJS
-- ✅ Función para notificaciones de citas nuevas
-- ✅ Funciones extensibles para recordatorios y cancelaciones
-- ✅ Checkbox en formulario para activar/desactivar envío
-- ✅ Formato de email personalizable con plantillas
-- ✅ Manejo de errores sin interrumpir flujo principal
-- ✅ Notificación visual al usuario del envío exitoso
+- Servicio de envío de emails con EmailJS
+- Función para notificaciones de citas nuevas
+- Funciones extensibles para recordatorios y cancelaciones
+- Checkbox en formulario para activar/desactivar envío
+- Formato de email personalizable con plantillas
+- Manejo de errores sin interrumpir flujo principal
+- Notificación visual al usuario del envío exitoso
 
 ### Configuración Requerida
 
@@ -282,10 +271,10 @@ async crearCita() {
    Hola {{to_name}},
    
    Tu cita ha sido confirmada:
-   📅 Fecha: {{appointment_date}}
-   ⏰ Hora: {{appointment_time}}
-   📋 Tipo: {{appointment_type}}
-   👨‍⚕️ Nutricionista: {{nutritionist_name}}
+    Fecha: {{appointment_date}}
+    Hora: {{appointment_time}}
+    Tipo: {{appointment_type}}
+    Nutricionista: {{nutritionist_name}}
    
    Notas: {{notes}}
    ```
@@ -295,49 +284,10 @@ async crearCita() {
    - Public Key
 5. **Actualizar `emailService.js`** con las credenciales
 
-### Capturas de Pantalla
-- Checkbox "Enviar notificación por email" en formulario de citas
-- Notificación de éxito "✉️ Notificación enviada al paciente"
-- Email recibido por el paciente con detalles de la cita
-- Dashboard de EmailJS mostrando emails enviados
+
 
 ---
 
-## 📊 Comparación de Librerías
-
-| Característica | jsPDF | Chart.js | EmailJS |
-|----------------|-------|----------|---------|
-| **Tipo** | Generación de PDFs | Visualización de datos | Envío de emails |
-| **Instalación** | npm install jspdf | npm install chart.js | npm install @emailjs/browser |
-| **Complejidad** | Media | Media-Alta | Baja |
-| **Requiere Backend** | No | Sí (para datos) | No |
-| **Configuración Externa** | No | No | Sí (cuenta EmailJS) |
-| **Costo** | Gratis | Gratis | Gratis (200 emails/mes) |
-| **Documentación** | Excelente | Excelente | Muy buena |
-| **Popularidad** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-
----
-
-## 🎯 Impacto en el Proyecto
-
-### Beneficios Obtenidos
-
-**jsPDF:**
-- ✅ Expedientes médicos profesionales
-- ✅ Documentación imprimible
-- ✅ Sin dependencia de servicios externos
-
-**Chart.js:**
-- ✅ Visualización clara del progreso del paciente
-- ✅ Mejor toma de decisiones clínicas
-- ✅ Interfaz profesional y atractiva
-- ✅ Full-stack implementation (Backend + Frontend)
-
-**EmailJS:**
-- ✅ Comunicación automatizada con pacientes
-- ✅ Reducción de ausencias a citas
-- ✅ Mejor experiencia del usuario
-- ✅ Sin infraestructura de email propia
 
 ### Arquitectura General
 
@@ -371,7 +321,7 @@ SERVICIOS EXTERNOS:
 
 ---
 
-## 📦 Archivos del Proyecto
+##  Archivos del Proyecto
 
 ### Estructura Completa
 
@@ -408,7 +358,7 @@ NUTRITRACK/
 
 ---
 
-## 🔧 Instalación y Configuración
+##  Instalación y Configuración
 
 ### Prerequisitos
 - Node.js 16+
@@ -444,63 +394,8 @@ npm run dev
 # http://localhost:3000
 ```
 
----
 
-## 📸 Capturas de Pantalla Requeridas
-
-Para la entrega de la tarea, capturar:
-
-1. **jsPDF:**
-   - Botón "📄 Generar PDF" en vista del paciente
-   - PDF descargado abierto mostrando expediente completo
-   - Código relevante en `PatientDetailView.vue`
-
-2. **Chart.js:**
-   - Sección "📊 Historial de Peso" con gráfica visible
-   - Formulario de registro de peso
-   - Tabla con historial y diferencias (▲/▼)
-   - Código en `WeightChart.vue` y `WeightRecordController.java`
-
-3. **EmailJS:**
-   - Checkbox "Enviar notificación por email" en formulario de citas
-   - Mensaje de confirmación "✉️ Notificación enviada"
-   - Email recibido en bandeja de entrada del paciente
-   - Dashboard de EmailJS con estadísticas
-   - Código en `emailService.js` y `GestionCitas.vue`
-
----
-
-## 📚 Referencias
-
-- **jsPDF**: https://github.com/parallax/jsPDF
-- **Chart.js**: https://www.chartjs.org/
-- **vue-chartjs**: https://vue-chartjs.org/
-- **EmailJS**: https://www.emailjs.com/docs/
-
----
-
-## 👨‍💻 Conclusión
-
-Las tres librerías implementadas en NutriTrack demuestran:
-
-1. **Integración Full-Stack**: Chart.js requirió desarrollo tanto en backend (API REST, entidad JPA) como frontend (componente Vue)
-
-2. **Diversidad Tecnológica**: 
-   - jsPDF: Generación de documentos
-   - Chart.js: Visualización de datos
-   - EmailJS: Comunicación externa
-
-3. **Valor Práctico**: Cada librería resuelve una necesidad real del sistema:
-   - Documentación profesional (jsPDF)
-   - Análisis visual de progreso (Chart.js)
-   - Comunicación con pacientes (EmailJS)
-
-4. **Buenas Prácticas**:
-   - Código modular y reutilizable
-   - Manejo de errores
-   - Experiencia de usuario mejorada
-   - Documentación completa
 
 **Fecha de implementación**: Noviembre 2025  
-**Desarrollador**: Carlo  
+**Desarrollador**: Carlos Emiliano Hernandez 
 **Proyecto**: NutriTrack - Sistema de Gestión Nutricional

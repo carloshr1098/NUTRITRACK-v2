@@ -1,10 +1,12 @@
 package com.nutritrack.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "diet_meals")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DietMeal {
     
     @Id
@@ -13,6 +15,7 @@ public class DietMeal {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diet_plan_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private DietPlan dietPlan;
     
     @Column(name = "meal_type")
@@ -20,6 +23,9 @@ public class DietMeal {
     
     @Column(name = "meal_name")
     private String mealName;
+    
+    @Column(name = "servings")
+    private Integer servings; // Número de porciones (ej: 2 huevos, 3 rebanadas)
     
     @Column(name = "description", length = 1000)
     private String description;
@@ -88,6 +94,9 @@ public class DietMeal {
     
     public String getMealName() { return mealName; }
     public void setMealName(String mealName) { this.mealName = mealName; }
+    
+    public Integer getServings() { return servings; }
+    public void setServings(Integer servings) { this.servings = servings; }
     
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }

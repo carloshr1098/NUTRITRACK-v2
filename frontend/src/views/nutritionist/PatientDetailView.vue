@@ -200,8 +200,9 @@
           <div v-for="appointment in paciente.appointments" :key="appointment.id" 
                style="border: 1px solid #eee; border-radius: 4px; padding: 15px; margin-bottom: 10px;">
             <p style="margin: 5px 0;"><strong>Fecha:</strong> {{ formatearFecha(appointment.appointmentDate) }}</p>
-            <p style="margin: 5px 0;"><strong>Hora:</strong> {{ appointment.appointmentTime }}</p>
-            <p style="margin: 5px 0;"><strong>Estado:</strong> {{ appointment.status }}</p>
+            <p style="margin: 5px 0;"><strong>Hora:</strong> {{ formatearHora(appointment.appointmentDate) }}</p>
+            <p style="margin: 5px 0;"><strong>Tipo:</strong> {{ traducirTipoCita(appointment.appointmentType) }}</p>
+            <p style="margin: 5px 0;"><strong>Estado:</strong> {{ traducirEstado(appointment.status) }}</p>
             <p v-if="appointment.notes" style="margin: 5px 0;"><strong>Notas:</strong> {{ appointment.notes }}</p>
           </div>
         </div>
@@ -558,6 +559,40 @@ export default {
       } catch (e) {
         return fecha
       }
+    },
+
+    formatearHora(fecha) {
+      if (!fecha) return 'N/A'
+      try {
+        const date = new Date(fecha)
+        return date.toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      } catch (e) {
+        return 'N/A'
+      }
+    },
+
+    traducirTipoCita(tipo) {
+      const traducciones = {
+        'CONSULTATION': 'Consulta',
+        'FOLLOW_UP': 'Seguimiento',
+        'EMERGENCY': 'Emergencia'
+      }
+      return traducciones[tipo] || tipo
+    },
+
+    traducirEstado(status) {
+      const traducciones = {
+        'SCHEDULED': 'Programada',
+        'CONFIRMED': 'Confirmada',
+        'COMPLETED': 'Completada',
+        'CANCELLED': 'Cancelada',
+        'NO_SHOW': 'No asistió',
+        'ATENDIDO': 'Atendida'
+      }
+      return traducciones[status] || status
     },
     
     abrirModalEdicion() {

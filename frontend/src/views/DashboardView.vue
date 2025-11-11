@@ -44,6 +44,18 @@
           Ver Planes
         </router-link>
       </div>
+
+      <!-- Card para Base de Datos de Alimentos -->
+      <div style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; background: white;">
+        <h3 style="color: #17a2b8; margin: 0 0 15px 0;">🥗 Base de Alimentos</h3>
+        <p style="color: #666; margin-bottom: 15px;">Gestionar alimentos y nutrición</p>
+        <router-link 
+          to="/nutriologo/alimentos" 
+          style="display: inline-block; padding: 10px 20px; background: #17a2b8; color: white; text-decoration: none; border-radius: 4px;"
+        >
+          Ver Alimentos
+        </router-link>
+      </div>
       
     </div>
     
