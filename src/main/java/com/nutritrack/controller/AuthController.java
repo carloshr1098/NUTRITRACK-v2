@@ -5,6 +5,7 @@ import com.nutritrack.entity.Role;
 import com.nutritrack.entity.User;
 import com.nutritrack.payload.request.LoginRequest;
 import com.nutritrack.payload.request.SignupRequest;
+import com.nutritrack.payload.request.UpdateProfileRequest;
 import com.nutritrack.payload.response.JwtResponse;
 import com.nutritrack.payload.response.MessageResponse;
 import com.nutritrack.repository.RoleRepository;
@@ -75,6 +76,9 @@ public class AuthController {
                 detallesUsuario.getEmail(),
                 detallesUsuario.getFirstName(),
                 detallesUsuario.getLastName(),
+                detallesUsuario.getDegree(),
+                detallesUsuario.getUniversity(),
+                detallesUsuario.getProfessionalLicense(),
                 roles));
     }
 
@@ -97,6 +101,9 @@ public class AuthController {
 
         usuario.setFirstName(solicitudRegistro.getFirstName());
         usuario.setLastName(solicitudRegistro.getLastName());
+        usuario.setDegree(solicitudRegistro.getDegree());
+        usuario.setUniversity(solicitudRegistro.getUniversity());
+        usuario.setProfessionalLicense(solicitudRegistro.getProfessionalLicense());
 
         Set<String> rolesStr = solicitudRegistro.getRole();
         Set<Role> roles = new HashSet<>();
@@ -132,6 +139,63 @@ public class AuthController {
         userRepository.save(usuario);
 
         return ResponseEntity.ok(new MessageResponse("Usuario registrado exitosamente!"));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<?> actualizarPerfil(@RequestBody UpdateProfileRequest solicitudActualizacion) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+            
+            User usuario = userRepository.findById(userPrincipal.getId())
+                    .orElseThrow(() -> new RuntimeException("Error: Usuario no encontrado."));
+            
+            // Actualizar solo los campos que se envían
+            if (solicitudActualizacion.getFirstName() != null && !solicitudActualizacion.getFirstName().isEmpty()) {
+                usuario.setFirstName(solicitudActualizacion.getFirstName());
+            }
+            if (solicitudActualizacion.getLastName() != null && !solicitudActualizacion.getLastName().isEmpty()) {
+                usuario.setLastName(solicitudActualizacion.getLastName());
+            }
+            if (solicitudActualizacion.getDegree() != null) {
+                usuario.setDegree(solicitudActualizacion.getDegree());
+            }
+            if (solicitudActualizacion.getUniversity() != null) {
+                usuario.setUniversity(solicitudActualizacion.getUniversity());
+            }
+            if (solicitudActualizacion.getProfessionalLicense() != null) {
+                usuario.setProfessionalLicense(solicitudActualizacion.getProfessionalLicense());
+            }
+            if (solicitudActualizacion.getPhone() != null) {
+                usuario.setPhone(solicitudActualizacion.getPhone());
+            }
+            if (solicitudActualizacion.getAddress() != null) {
+                usuario.setAddress(solicitudActualizacion.getAddress());
+            }
+            
+            userRepository.save(usuario);
+            
+            // Retornar los datos actualizados
+            List<String> roles = usuario.getRoles().stream()
+                    .map(role -> role.getName().name())
+                    .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(new JwtResponse(
+                    userPrincipal.getUsername(), // Realmente no importa aquí
+                    usuario.getId(),
+                    usuario.getUsername(),
+                    usuario.getEmail(),
+                    usuario.getFirstName(),
+                    usuario.getLastName(),
+                    usuario.getDegree(),
+                    usuario.getUniversity(),
+                    usuario.getProfessionalLicense(),
+                    roles
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error al actualizar el perfil: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/test")

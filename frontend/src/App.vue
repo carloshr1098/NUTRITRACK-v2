@@ -1,33 +1,43 @@
 <template>
-  <div id="app">
-    <nav style="padding: 20px; background: #f5f5f5; margin-bottom: 20px;">
-      <router-link to="/login" style="margin-right: 20px;">Login</router-link>
-      <router-link to="/dashboard">Dashboard</router-link>
-    </nav>
-    <div style="padding: 20px;">
-      <router-view />
-    </div>
-  </div>
+  <v-app>
+    <nav-bar v-if="!isLoginRoute" />
+    
+    <v-main>
+      <v-container fluid :class="{ 'pa-0': isLoginRoute }">
+        <router-view />
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import NavBar from './components/NavBar.vue'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    NavBar
+  },
+  setup() {
+    const route = useRoute()
+    
+    const isLoginRoute = computed(() => {
+      return route.path === '/login' || route.path === '/'
+    })
+    
+    return {
+      isLoginRoute
+    }
+  }
 }
 </script>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
+@import './assets/main.css';
 
-a {
-  color: #2c3e50;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
+#app {
+  background-color: #F5F5F5;
 }
 </style>

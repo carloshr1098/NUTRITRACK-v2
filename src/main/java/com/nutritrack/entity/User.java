@@ -47,6 +47,18 @@ public class User {
     @Column(name = "phone")
     private String phone;
     
+    @Column(name = "address")
+    private String address; // Dirección del consultorio
+    
+    @Column(name = "degree")
+    private String degree; // Título profesional (Lic. en Nutrición, etc.)
+    
+    @Column(name = "university")
+    private String university; // Universidad de egreso
+    
+    @Column(name = "professional_license")
+    private String professionalLicense; // Cédula profesional
+    
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
@@ -96,6 +108,18 @@ public class User {
     
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+    
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+    
+    public String getDegree() { return degree; }
+    public void setDegree(String degree) { this.degree = degree; }
+    
+    public String getUniversity() { return university; }
+    public void setUniversity(String university) { this.university = university; }
+    
+    public String getProfessionalLicense() { return professionalLicense; }
+    public void setProfessionalLicense(String professionalLicense) { this.professionalLicense = professionalLicense; }
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

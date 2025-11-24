@@ -56,6 +56,18 @@
           Ver Alimentos
         </router-link>
       </div>
+
+      <!-- Card para Mi Perfil -->
+      <div style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; background: white;">
+        <h3 style="color: #5FC3E4; margin: 0 0 15px 0;">👤 Mi Perfil Profesional</h3>
+        <p style="color: #666; margin-bottom: 15px;">Editar información profesional</p>
+        <router-link 
+          to="/nutriologo/perfil" 
+          style="display: inline-block; padding: 10px 20px; background: #5FC3E4; color: white; text-decoration: none; border-radius: 4px;"
+        >
+          Ver Perfil
+        </router-link>
+      </div>
       
     </div>
     

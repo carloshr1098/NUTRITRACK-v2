@@ -855,7 +855,7 @@ export default {
         }
 
         // Generar PDF
-        const fileName = generarPDFPlanDietético(
+        const fileName = await generarPDFPlanDietético(
           planInfo,
           this.comidas,
           this.resumen,

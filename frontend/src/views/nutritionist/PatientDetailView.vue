@@ -436,6 +436,7 @@
 <script>
 import api from '../../services/api.js'
 import jsPDF from 'jspdf'
+import { generarEncabezadoPDF } from '../../services/pdfService.js'
 import WeightChart from '../../components/WeightChart.vue'
 
 export default {
@@ -485,6 +486,31 @@ export default {
     this.cargarRegistrosPeso()
   },
   methods: {
+    async cargarLogo() {
+      const rutasLogo = [
+        '/logo/nutritrack-logo.png',
+        '/logo/logos_tampeq/nutritrack-logo.png'
+      ]
+      
+      for (const ruta of rutasLogo) {
+        try {
+          const response = await fetch(ruta)
+          if (response.ok) {
+            const blob = await response.blob()
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader()
+              reader.onloadend = () => resolve(reader.result)
+              reader.onerror = reject
+              reader.readAsDataURL(blob)
+            })
+          }
+        } catch (error) {
+          console.warn(`No se pudo cargar logo desde ${ruta}`)
+        }
+      }
+      return null
+    },
+    
     async cargarPaciente() {
       try {
         this.loading = true
@@ -650,36 +676,17 @@ export default {
       }
     },
     
-    generarFichaPDF() {
+    async generarFichaPDF() {
       try {
         const doc = new jsPDF()
-        let y = 20 // Posición vertical inicial
         
-        // ==================== ENCABEZADO CON DISEÑO ====================
-        // Banner superior verde
-        doc.setFillColor(76, 175, 80) // Verde #4CAF50
-        doc.rect(0, 0, 210, 35, 'F')
+        // ==================== ENCABEZADO ESTANDARIZADO ====================
+        const userStr = localStorage.getItem('user')
+        const nutricionistaInfo = userStr ? JSON.parse(userStr) : null
         
-        // Logo/Icono (simulado con círculo)
-        doc.setFillColor(255, 255, 255)
-        doc.circle(20, 17, 8, 'F')
-        doc.setFontSize(16)
-        doc.setTextColor(76, 175, 80)
-        doc.text('N', 20, 20, { align: 'center' })
+        await generarEncabezadoPDF(doc, 'Expediente Médico del Paciente', nutricionistaInfo)
         
-        // Título principal en blanco
-        doc.setFontSize(24)
-        doc.setFont('helvetica', 'bold')
-        doc.setTextColor(255, 255, 255)
-        doc.text('EXPEDIENTE MÉDICO', 105, 18, { align: 'center' })
-        
-        // Subtítulo
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.text('Sistema NutriTrack - Gestión Nutricional', 105, 26, { align: 'center' })
-        
-        y = 45
-        y = 45
+        let y = 55
         
         // ==================== INFORMACIÓN PERSONAL ====================
         // Caja con borde y fondo
@@ -1060,41 +1067,62 @@ export default {
           }
         }
         
-        // ==================== FOOTER PROFESIONAL ====================
+        // ============ PIE DE PÁGINA (igual que dietas) ============
         const totalPages = doc.internal.getNumberOfPages()
-        const fechaGeneracion = new Date().toLocaleString('es-MX', { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
+        const colorVerde = [139, 195, 74]
+        const colorGris = [120, 120, 120]
+        const colorAzul = [95, 195, 228]
         
-        // Agregar footer en todas las páginas
         for (let i = 1; i <= totalPages; i++) {
           doc.setPage(i)
           
-          // Línea superior del footer
-          doc.setDrawColor(76, 175, 80)
+          // Línea decorativa superior del pie
+          doc.setDrawColor(200, 200, 200)
           doc.setLineWidth(0.5)
-          doc.line(20, 280, 190, 280)
+          doc.line(20, 275, 190, 275)
           
-          // Información del footer
+          // Número de página
           doc.setFontSize(8)
+          doc.setTextColor(...colorGris)
+          doc.setFont('helvetica', 'normal')
+          doc.text(
+            `Pagina ${i} de ${totalPages}`,
+            105,
+            281,
+            { align: 'center' }
+          )
+          
+          // Nombre del sistema
+          doc.setFont('helvetica', 'bold')
+          doc.setTextColor(...colorVerde)
+          doc.text(
+            'NUTRITRACK',
+            105,
+            286,
+            { align: 'center' }
+          )
+          
+          // Subtítulo
+          doc.setFont('helvetica', 'normal')
+          doc.setFontSize(7)
+          doc.setTextColor(...colorGris)
+          doc.text(
+            'Sistema de Gestion Nutricional',
+            105,
+            290,
+            { align: 'center' }
+          )
+          
+          // Página web (esquina inferior derecha)
+          doc.setFontSize(7)
+          doc.setTextColor(...colorAzul)
+          doc.text('www.nutritrack.com', 190, 290, { align: 'right' })
+          
+          // Texto confidencial (centrado debajo de todo)
+          doc.setFontSize(6)
           doc.setFont('helvetica', 'italic')
           doc.setTextColor(120, 120, 120)
-          
-          if (i === 1) {
-            doc.text(`Generado: ${fechaGeneracion}`, 20, 285)
-          }
-          
-          doc.text('NutriTrack - Sistema de Gestión Nutricional', 105, 285, { align: 'center' })
-          doc.text(`Página ${i} de ${totalPages}`, 190, 285, { align: 'right' })
-          
-          // Texto confidencial
-          doc.setFontSize(7)
-          doc.setTextColor(150, 150, 150)
-          doc.text('Documento confidencial - Uso exclusivo del personal médico autorizado', 105, 290, { align: 'center' })
+          doc.text('Documento confidencial - Uso exclusivo del personal médico autorizado', 105, 294, { align: 'center' })
         }
         
         // Guardar el PDF

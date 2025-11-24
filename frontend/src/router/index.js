@@ -14,6 +14,7 @@ import NutritionistPatientsView from '../views/nutritionist/NutritionistPatients
 import NutritionistAppointmentsView from '../views/nutritionist/NutritionistAppointmentsView.vue'
 import NutritionistDietPlansView from '../views/nutritionist/NutritionistDietPlansView.vue'
 import NutritionistFoodsView from '../views/nutritionist/NutritionistFoodsView.vue'
+import NutritionistProfileView from '../views/nutritionist/NutritionistProfileView.vue'
 import PatientDetailView from '../views/nutritionist/PatientDetailView.vue'
 
 // Patient views
@@ -83,6 +84,12 @@ const routes = [
     path: '/nutriologo/alimentos',
     name: 'NutriologoAlimentos',
     component: NutritionistFoodsView,
+    meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
+  },
+  {
+    path: '/nutriologo/perfil',
+    name: 'NutriologoPerfil',
+    component: NutritionistProfileView,
     meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
   },
   // Rutas del Paciente

@@ -28,6 +28,12 @@ public class SignupRequest {
     @NotBlank
     private String lastName;
 
+    private String degree;
+
+    private String university;
+
+    private String professionalLicense;
+
     public String getUsername() {
         return username;
     }
@@ -74,5 +80,29 @@ public class SignupRequest {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getDegree() {
+        return degree;
+    }
+
+    public void setDegree(String degree) {
+        this.degree = degree;
+    }
+
+    public String getUniversity() {
+        return university;
+    }
+
+    public void setUniversity(String university) {
+        this.university = university;
+    }
+
+    public String getProfessionalLicense() {
+        return professionalLicense;
+    }
+
+    public void setProfessionalLicense(String professionalLicense) {
+        this.professionalLicense = professionalLicense;
     }
 }

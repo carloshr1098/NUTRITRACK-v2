@@ -10,16 +10,23 @@ public class JwtResponse {
     private String email;
     private String firstName;
     private String lastName;
+    private String degree;
+    private String university;
+    private String professionalLicense;
     private List<String> roles;
 
     public JwtResponse(String accessToken, Long id, String username, String email, 
-                      String firstName, String lastName, List<String> roles) {
+                      String firstName, String lastName, String degree, String university,
+                      String professionalLicense, List<String> roles) {
         this.token = accessToken;
         this.id = id;
         this.username = username;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.degree = degree;
+        this.university = university;
+        this.professionalLicense = professionalLicense;
         this.roles = roles;
     }
 
@@ -77,6 +84,30 @@ public class JwtResponse {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getDegree() {
+        return degree;
+    }
+
+    public void setDegree(String degree) {
+        this.degree = degree;
+    }
+
+    public String getUniversity() {
+        return university;
+    }
+
+    public void setUniversity(String university) {
+        this.university = university;
+    }
+
+    public String getProfessionalLicense() {
+        return professionalLicense;
+    }
+
+    public void setProfessionalLicense(String professionalLicense) {
+        this.professionalLicense = professionalLicense;
     }
 
     public List<String> getRoles() {

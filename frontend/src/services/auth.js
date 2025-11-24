@@ -25,15 +25,20 @@ const authService = {
   // Login method
   async login(credentials) {
     try {
+      console.log('🔐 Intentando login...')
       const response = await api.post('/auth/signin', credentials)
-      const { accessToken, ...userData } = response.data
+      console.log('📦 Respuesta del servidor:', response.data)
       
-      // Remover tokenType de los datos del usuario
-      delete userData.tokenType
+      // El backend devuelve 'accessToken' no 'token'
+      const { accessToken, type, ...userData } = response.data
+      console.log('🔑 Token extraído:', accessToken ? 'SÍ' : 'NO')
+      console.log('👤 userData:', userData)
       
       this.setAuthData(accessToken, userData)
+      console.log('✅ Login completado')
       return response.data
     } catch (error) {
+      console.error('❌ Error en login:', error)
       throw error
     }
   },
@@ -55,6 +60,9 @@ const authService = {
 
   // Set authentication data
   setAuthData(accessToken, userData) {
+    console.log('💾 Guardando token:', accessToken ? 'SÍ' : 'NO')
+    console.log('💾 Guardando usuario:', userData)
+    
     token.value = accessToken
     user.value = userData
     localStorage.setItem('token', accessToken)
@@ -62,6 +70,8 @@ const authService = {
     
     // Set default authorization header
     api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
+    
+    console.log('✅ Token guardado en localStorage')
   },
 
   // Clear authentication data

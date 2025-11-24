@@ -870,7 +870,11 @@ export default {
           calorias: plan.dailyCalories
         }
 
-        const fileName = generarPDFPlanDietético(planInfo, comidas, resumen, pacienteInfo)
+        // Obtener información del nutricionista actual
+        const userStr = localStorage.getItem('user')
+        const nutricionistaInfo = userStr ? JSON.parse(userStr) : null
+
+        const fileName = await generarPDFPlanDietético(planInfo, comidas, resumen, pacienteInfo, nutricionistaInfo)
         this.mostrarExito(`✅ PDF generado: ${fileName}`)
       } catch (error) {
         console.error('Error al exportar PDF:', error)

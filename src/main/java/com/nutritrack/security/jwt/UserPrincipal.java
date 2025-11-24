@@ -19,6 +19,9 @@ public class UserPrincipal implements UserDetails {
     private String email;
     private String firstName;
     private String lastName;
+    private String degree;
+    private String university;
+    private String professionalLicense;
 
     @JsonIgnore
     private String password;
@@ -26,14 +29,17 @@ public class UserPrincipal implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserPrincipal(Long id, String username, String email, String password, 
-                        String firstName, String lastName,
-                        Collection<? extends GrantedAuthority> authorities) {
+                        String firstName, String lastName, String degree, String university,
+                        String professionalLicense, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.degree = degree;
+        this.university = university;
+        this.professionalLicense = professionalLicense;
         this.authorities = authorities;
     }
 
@@ -49,6 +55,9 @@ public class UserPrincipal implements UserDetails {
                 user.getPassword(),
                 user.getFirstName(),
                 user.getLastName(),
+                user.getDegree(),
+                user.getUniversity(),
+                user.getProfessionalLicense(),
                 authorities
         );
     }
@@ -67,6 +76,18 @@ public class UserPrincipal implements UserDetails {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public String getDegree() {
+        return degree;
+    }
+
+    public String getUniversity() {
+        return university;
+    }
+
+    public String getProfessionalLicense() {
+        return professionalLicense;
     }
 
     @Override

@@ -29,13 +29,21 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
                                   FilterChain filterChain) throws ServletException, IOException {
-        // Skip JWT validation for auth endpoints
+        // Skip JWT validation for public auth endpoints only
         String path = request.getRequestURI();
         String method = request.getMethod();
         
         logger.debug("Processing request: {} {}", method, path);
         
-        if (path.startsWith("/api/auth/") || path.startsWith("/h2-console")) {
+        // Only skip JWT for public auth endpoints (signin, signup, test, etc.)
+        // Profile endpoint requires authentication
+        boolean isPublicAuthEndpoint = path.equals("/api/auth/signin") 
+                || path.equals("/api/auth/signup")
+                || path.equals("/api/auth/test")
+                || path.equals("/api/auth/debug-users")
+                || path.equals("/api/auth/init-data");
+        
+        if (isPublicAuthEndpoint || path.startsWith("/h2-console")) {
             filterChain.doFilter(request, response);
             return;
         }

@@ -1,7 +1,9 @@
 <template>
   <div style="max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-    <h1 style="text-align: center; color: #2c3e50;">NutriTrack</h1>
-    <p style="text-align: center; color: #666; margin-bottom: 30px;">Sistema de Gestión Nutricional</p>
+    <!-- Logo completo -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <img src="/logo/nutritrack-logo.png" alt="NutriTrack - Monitoreo Nutricional" style="max-width: 300px; height: auto;" />
+    </div>
     
     <div v-if="error" style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
       {{ error }}
@@ -69,17 +71,13 @@ export default {
       this.error = null
       
       try {
-        const response = await authService.login(this.form)
+        await authService.login(this.form)
         
-        if (response && response.accessToken) {
-          // El servicio ya maneja el token y usuario internamente
-          this.$router.push('/dashboard')
-        } else {
-          this.error = 'Credenciales inválidas'
-        }
+        // Si llegamos aquí, el login fue exitoso
+        this.$router.push('/dashboard')
       } catch (error) {
         console.error('Error en login:', error)
-        this.error = error.message || 'Error al iniciar sesión'
+        this.error = error.response?.data?.message || error.message || 'Error al iniciar sesión'
       } finally {
         this.loading = false
       }

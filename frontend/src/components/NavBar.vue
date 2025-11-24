@@ -9,7 +9,7 @@
     <!-- Logo y título -->
     <v-toolbar-title class="d-flex align-center cursor-pointer" @click="goHome">
       <div class="logo-container">
-        <v-icon size="45" class="logo-icon">mdi-leaf</v-icon>
+        <img src="/logo/nutritrack-icon.png" alt="NutriTrack Logo" class="logo-icon" width="45" height="45" />
       </div>
       <div class="brand-text ml-3">
         <div class="brand-name">NutriTrack</div>
@@ -37,7 +37,7 @@
     <v-menu v-if="isAuthenticated" offset-y>
       <template v-slot:activator="{ props }">
         <v-btn icon v-bind="props" class="ml-2">
-          <v-avatar size="40" color="#2A071FF">
+          <v-avatar size="40" color="#2A07FF">
             <v-icon color="white">mdi-account</v-icon>
           </v-avatar>
         </v-btn>
@@ -146,17 +146,18 @@ export default {
       
       if (roles.includes('ROLE_NUTRIOLOGO') || roles.includes('ROLE_ADMIN')) {
         return [
-          { title: 'Dashboard', icon: 'mdi-view-dashboard', route: '/nutricionista/dashboard', color: '#2A071FF' },
-          { title: 'Pacientes', icon: 'mdi-account-group', route: '/nutricionista/pacientes', color: '#FF01FF' },
-          { title: 'Citas', icon: 'mdi-calendar', route: '/nutricionista/citas', color: '#B8D438' },
-          { title: 'Planes', icon: 'mdi-food-apple', route: '/nutricionista/planes', color: '#7A7A5A' },
-          { title: 'Alimentos', icon: 'mdi-database', route: '/nutricionista/alimentos', color: '#FF0000' }
+          { title: 'Dashboard', icon: 'mdi-view-dashboard', route: '/', color: '#2A07FF' },
+          { title: 'Pacientes', icon: 'mdi-account-group', route: '/nutriologo/pacientes', color: '#FF01FF' },
+          { title: 'Citas', icon: 'mdi-calendar', route: '/nutriologo/citas', color: '#B8D438' },
+          { title: 'Planes', icon: 'mdi-food-apple', route: '/nutriologo/planes-dieteticos', color: '#7A7A5A' },
+          { title: 'Alimentos', icon: 'mdi-database', route: '/nutriologo/alimentos', color: '#FF0000' },
+          { title: 'Mi Perfil', icon: 'mdi-account-cog', route: '/nutriologo/perfil', color: '#5FC3E4' }
         ]
       }
       
       if (roles.includes('ROLE_PACIENTE')) {
         return [
-          { title: 'Mi Perfil', icon: 'mdi-account', route: '/paciente/perfil', color: '#2A071FF' },
+          { title: 'Mi Perfil', icon: 'mdi-account', route: '/paciente/perfil', color: '#2A07FF' },
           { title: 'Mi Plan', icon: 'mdi-food-apple', route: '/paciente/plan', color: '#FF01FF' },
           { title: 'Citas', icon: 'mdi-calendar', route: '/paciente/citas', color: '#B8D438' },
           { title: 'Progreso', icon: 'mdi-chart-line', route: '/paciente/progreso', color: '#7A7A5A' }
@@ -188,7 +189,7 @@ export default {
       if (roles.includes('ROLE_PACIENTE')) {
         router.push('/paciente/perfil')
       } else if (roles.includes('ROLE_NUTRIOLOGO')) {
-        router.push('/nutricionista/dashboard')
+        router.push('/nutriologo/perfil')
       }
     }
     
@@ -231,6 +232,14 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(126, 211, 33, 0.1), rgba(74, 144, 226, 0.1));
+  transition: all 0.3s ease;
+}
+
+.logo-container:hover {
+  background: linear-gradient(135deg, rgba(126, 211, 33, 0.2), rgba(74, 144, 226, 0.2));
+  transform: scale(1.05);
 }
 
 .logo-image {
@@ -240,11 +249,8 @@ export default {
 }
 
 .logo-icon {
-  background: linear-gradient(135deg, #2A071FF 0%, #FF01FF 50%, #B8D438 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .logo-placeholder {
