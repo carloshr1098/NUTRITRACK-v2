@@ -92,22 +92,22 @@ const dibujarLogoVectorial = (doc) => {
   doc.circle(logoX, logoY, 12, 'D')
 }
 
-// Función para generar encabezado estandarizado
+// Función para generar encabezado compacto y moderno
 export const generarEncabezadoPDF = async (doc, subtitulo, nutricionistaInfo = null) => {
-  // Fondo principal
+  // Fondo principal más compacto
   doc.setFillColor(139, 195, 74)  // Verde NutriTrack
-  doc.rect(0, 0, 210, 50, 'F')
+  doc.rect(0, 0, 210, 48, 'F')
   
   // Borde superior elegante
   doc.setFillColor(44, 62, 80)  // Navy
-  doc.rect(0, 0, 210, 4, 'F')
+  doc.rect(0, 0, 210, 3, 'F')
   
-  // Cargar logo
+  // Cargar logo más pequeño
   const logoPNG = await cargarLogoOptimizado()
   
   if (logoPNG) {
     try {
-      doc.addImage(logoPNG, 'PNG', 3, 7, 75, 37)
+      doc.addImage(logoPNG, 'PNG', 5, 6, 70, 35)
     } catch (error) {
       console.warn('Logo PNG falló, usando vectorial')
       dibujarLogoVectorial(doc)
@@ -116,66 +116,67 @@ export const generarEncabezadoPDF = async (doc, subtitulo, nutricionistaInfo = n
     dibujarLogoVectorial(doc)
   }
   
-  // Texto principal del encabezado
+  // Texto principal del encabezado más compacto
   doc.setTextColor(255, 255, 255)
-  doc.setFontSize(16)
+  doc.setFontSize(14)
   doc.setFont('helvetica', 'bold')
-  doc.text('Sistema NutriTrack - Gestión Nutricional', 85, 18)
+  doc.text('Sistema NutriTrack - Gestión Nutricional', 82, 15)
   
   // Subtítulo
-  doc.setFontSize(13)
+  doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(255, 255, 255)
-  doc.text(subtitulo, 85, 27)
+  doc.text(subtitulo, 82, 22)
   
-  // Información profesional del nutricionista
+  // Información profesional del nutricionista más compacta
   if (nutricionistaInfo) {
-    doc.setFontSize(9)
+    doc.setFontSize(7.5)
     doc.setFont('helvetica', 'normal')
-    let yNutri = 31
+    let yNutri = 26
     
     // Nombre del nutricionista
     if (nutricionistaInfo.firstName || nutricionistaInfo.lastName) {
-      yNutri += 4.5
+      yNutri += 3.5
       const nombreCompleto = `${nutricionistaInfo.firstName || ''} ${nutricionistaInfo.lastName || ''}`.trim()
       doc.setFont('helvetica', 'bold')
-      doc.text(nombreCompleto, 85, yNutri)
+      doc.text(nombreCompleto, 82, yNutri)
       doc.setFont('helvetica', 'normal')
     }
     
     if (nutricionistaInfo.degree) {
-      yNutri += 3.5
-      doc.text(nutricionistaInfo.degree, 85, yNutri)
+      yNutri += 3
+      doc.text(nutricionistaInfo.degree, 82, yNutri)
     }
     
     if (nutricionistaInfo.university || nutricionistaInfo.professionalLicense) {
-      yNutri += 3.5
+      yNutri += 3
       const infoExtra = []
       if (nutricionistaInfo.university) infoExtra.push(nutricionistaInfo.university)
       if (nutricionistaInfo.professionalLicense) infoExtra.push(`Cédula: ${nutricionistaInfo.professionalLicense}`)
-      doc.text(infoExtra.join(' | '), 85, yNutri)
+      const textoCompleto = infoExtra.join(' | ')
+      const textoRecortado = doc.splitTextToSize(textoCompleto, 110)
+      doc.text(textoRecortado[0], 82, yNutri)
     }
     
-    // Teléfono y dirección
+    // Teléfono y dirección en línea compacta
     if (nutricionistaInfo.phone || nutricionistaInfo.address) {
-      yNutri += 3.5
-      if (nutricionistaInfo.phone) {
-        doc.text(`Tel: ${nutricionistaInfo.phone}`, 85, yNutri)
-      }
-      if (nutricionistaInfo.address) {
-        if (nutricionistaInfo.phone) yNutri += 3.5
-        doc.text(nutricionistaInfo.address, 85, yNutri)
-      }
+      yNutri += 3
+      const contacto = []
+      if (nutricionistaInfo.phone) contacto.push(`Tel: ${nutricionistaInfo.phone}`)
+      if (nutricionistaInfo.address) contacto.push(nutricionistaInfo.address)
+      const textoContacto = contacto.join(' • ')
+      const contactoRecortado = doc.splitTextToSize(textoContacto, 110)
+      doc.text(contactoRecortado[0], 82, yNutri)
     }
   }
   
-  // Fecha
-  doc.setFontSize(9)
+  // Fecha más compacta
+  doc.setFontSize(7.5)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(255, 255, 255)
   doc.text(new Date().toLocaleDateString('es-ES', { 
     year: 'numeric', month: 'long', day: 'numeric' 
-  }), 195, 47, { align: 'right' })
+  }), 198, 45, { align: 'right' })
 }
 
 export const generarPDFPlanDietético = async (planInfo, comidas, resumen, pacienteInfo, nutricionistaInfo = null) => {
@@ -199,118 +200,120 @@ export const generarPDFPlanDietético = async (planInfo, comidas, resumen, pacie
   // ============ ENCABEZADO ESTANDARIZADO ============
   await generarEncabezadoPDF(doc, 'Plan Dietético Personalizado', nutricionistaInfo)
   
-  let yPos = 55
+  let yPos = 52
   
-  // ============ INFORMACIÓN DEL PACIENTE Y PLAN (COMPACTA) ============
-  doc.setFillColor(245, 245, 245)
-  doc.roundedRect(10, yPos, 190, 28, 2, 2, 'F')
-  doc.setDrawColor(200, 200, 200)
-  doc.setLineWidth(0.2)
-  doc.roundedRect(10, yPos, 190, 28, 2, 2, 'S')
+  // ============ INFORMACIÓN DEL PACIENTE Y PLAN (ULTRA COMPACTA) ============
+  doc.setFillColor(248, 248, 248)
+  doc.roundedRect(10, yPos, 190, 22, 2, 2, 'F')
+  doc.setDrawColor(139, 195, 74)
+  doc.setLineWidth(0.3)
+  doc.roundedRect(10, yPos, 190, 22, 2, 2, 'S')
   
-  const yBase = yPos + 5
+  const yBase = yPos + 4
   
-  // Columna 1: Datos del paciente
+  // Columna 1: Datos del paciente (más compacta)
   let yPaciente = yBase
   doc.setTextColor(...colorVerde)
-  doc.setFontSize(9)
+  doc.setFontSize(8)
   doc.setFont('helvetica', 'bold')
-  doc.text('PACIENTE', 15, yPaciente)
+  doc.text('PACIENTE', 14, yPaciente)
   
-  yPaciente += 5
+  yPaciente += 4
   doc.setTextColor(...colorTexto)
   doc.setFont('helvetica', 'normal')
-  doc.setFontSize(8)
+  doc.setFontSize(7.5)
   
   if (pacienteInfo && pacienteInfo.nombre) {
-    doc.text(`Nombre: ${pacienteInfo.nombre}`, 15, yPaciente)
-    yPaciente += 4
+    doc.text(`Nombre: ${pacienteInfo.nombre}`, 14, yPaciente)
+    yPaciente += 3.5
   }
   
   if (pacienteInfo && pacienteInfo.email) {
-    doc.text(`Email: ${pacienteInfo.email}`, 15, yPaciente)
-    yPaciente += 4
+    doc.text(`Email: ${pacienteInfo.email}`, 14, yPaciente)
+    yPaciente += 3.5
   }
   
   if (pacienteInfo && pacienteInfo.peso) {
     doc.setFont('helvetica', 'bold')
-    doc.text(`Peso actual: ${pacienteInfo.peso} kg`, 15, yPaciente)
+    doc.text(`Peso actual: ${pacienteInfo.peso} kg`, 14, yPaciente)
   }
   
-  // Columna 2: Datos del plan
+  // Columna 2: Datos del plan (más compacta)
   let yPlan = yBase
   doc.setTextColor(...colorVerde)
-  doc.setFontSize(9)
+  doc.setFontSize(8)
   doc.setFont('helvetica', 'bold')
-  doc.text('PLAN DIETETICO', 110, yPlan)
+  doc.text('PLAN DIETÉTICO', 105, yPlan)
   
-  yPlan += 5
+  yPlan += 4
   doc.setTextColor(...colorTexto)
   doc.setFont('helvetica', 'normal')
-  doc.setFontSize(8)
+  doc.setFontSize(7.5)
   
-  const planNombre = doc.splitTextToSize(planInfo.nombre || 'Plan Dietetico', 85)
-  doc.text(`Plan: ${planNombre[0]}`, 110, yPlan)
-  yPlan += 4
+  const planNombre = doc.splitTextToSize(planInfo.nombre || 'Plan Dietético', 90)
+  doc.text(`Plan: ${planNombre[0]}`, 105, yPlan)
+  yPlan += 3.5
   
   if (planInfo.objetivo) {
-    const objetivo = doc.splitTextToSize(planInfo.objetivo, 85)
-    doc.text(`Objetivo: ${objetivo[0]}`, 110, yPlan)
-    yPlan += 4
+    const objetivo = doc.splitTextToSize(planInfo.objetivo, 90)
+    doc.text(`Objetivo: ${objetivo[0]}`, 105, yPlan)
+    yPlan += 3.5
   }
   
   if (planInfo.calorias) {
     doc.setFont('helvetica', 'bold')
-    doc.text(`Meta: ${planInfo.calorias} kcal/dia`, 110, yPlan)
+    doc.text(`Meta: ${planInfo.calorias} kcal/día`, 105, yPlan)
   }
   
-  yPos = 90
+  yPos = 77
   
-  // ============ RESUMEN NUTRICIONAL COMPACTO ============
+  // ============ RESUMEN NUTRICIONAL ULTRA COMPACTO ============
   doc.setFillColor(...colorAzul)
-  doc.roundedRect(10, yPos, 190, 8, 2, 2, 'F')
+  doc.roundedRect(10, yPos, 190, 6, 2, 2, 'F')
   
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(10)
-  doc.text('RESUMEN NUTRICIONAL DIARIO', 15, yPos + 5.5)
+  doc.setFontSize(9)
+  doc.text('RESUMEN NUTRICIONAL DIARIO', 15, yPos + 4.5)
   
-  yPos += 12
+  yPos += 9
   
-  // Tabla compacta de resumen
+  // Tabla ultra compacta de resumen con diseño moderno
   autoTable(doc, {
     startY: yPos,
     body: [[
-      `CALORIAS\n${resumen.totalCalories || 0} kcal`,
-      `PROTEINAS\n${(resumen.totalProtein || 0).toFixed(1)} g`,
+      `CALORÍAS\n${resumen.totalCalories || 0} kcal`,
+      `PROTEÍNAS\n${(resumen.totalProtein || 0).toFixed(1)} g`,
       `CARBOS\n${(resumen.totalCarbs || 0).toFixed(1)} g`,
       `GRASAS\n${(resumen.totalFat || 0).toFixed(1)} g`,
       `FIBRA\n${(resumen.totalFiber || 0).toFixed(1)} g`,
       `COMIDAS\n${comidas.length}`
     ]],
     theme: 'plain',
-    margin: { left: 15, right: 15 },
+    margin: { left: 12, right: 12 },
     styles: {
-      fontSize: 8,
-      cellPadding: 4,
+      fontSize: 7.5,
+      cellPadding: 3,
       textColor: colorTexto,
       halign: 'center',
       valign: 'middle',
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      lineWidth: 0.1,
+      lineColor: [220, 220, 220]
     },
     columnStyles: {
-      0: { fillColor: [255, 235, 238] },      // Calorías - rosa claro
-      1: { fillColor: [232, 245, 233] },      // Proteínas - verde claro
-      2: { fillColor: [227, 242, 253] },      // Carbos - azul claro
-      3: { fillColor: [255, 243, 224] },      // Grasas - naranja claro
-      4: { fillColor: [237, 247, 237] },      // Fibra - verde muy claro
-      5: { fillColor: [248, 248, 248] }       // Comidas - gris claro
+      0: { fillColor: [255, 239, 243], textColor: [194, 24, 91] },      // Calorías - rosa
+      1: { fillColor: [232, 245, 233], textColor: [76, 175, 80] },      // Proteínas - verde
+      2: { fillColor: [227, 242, 253], textColor: [33, 150, 243] },     // Carbos - azul
+      3: { fillColor: [255, 243, 224], textColor: [255, 152, 0] },      // Grasas - naranja
+      4: { fillColor: [237, 247, 237], textColor: [104, 159, 56] },     // Fibra - verde olivo
+      5: { fillColor: [245, 245, 245], textColor: [97, 97, 97] }        // Comidas - gris
     }
   })
   
-  yPos = doc.lastAutoTable.finalY + 10
+  yPos = doc.lastAutoTable.finalY + 8
   
-  // ============ COMIDAS POR TIPO (COMPACTO) ============
+  // ============ COMIDAS POR TIPO (ULTRA COMPACTO Y MODERNO) ============
   const tiposComida = [
     { tipo: 'BREAKFAST', nombre: 'DESAYUNO', color: [255, 193, 7] },
     { tipo: 'SNACK', nombre: 'SNACK', color: [156, 39, 176] },
@@ -324,23 +327,23 @@ export const generarPDFPlanDietético = async (planInfo, comidas, resumen, pacie
     if (comidasTipo.length === 0) return
     
     // Verificar espacio
-    if (yPos > 250) {
+    if (yPos > 255) {
       doc.addPage()
-      yPos = 20
+      yPos = 15
     }
     
-    // Encabezado compacto
+    // Encabezado ultra compacto con gradiente visual
     doc.setFillColor(...color)
-    doc.roundedRect(10, yPos, 190, 7, 1, 1, 'F')
+    doc.roundedRect(10, yPos, 190, 5.5, 1, 1, 'F')
     
     doc.setTextColor(255, 255, 255)
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(9)
-    doc.text(nombre, 15, yPos + 5)
+    doc.setFontSize(8.5)
+    doc.text(nombre, 14, yPos + 4)
     
-    yPos += 10
+    yPos += 7.5
     
-    // Tabla compacta de comidas
+    // Tabla ultra compacta de comidas con diseño moderno
     const rows = comidasTipo.map(comida => {
       const servings = comida.servings > 1 ? `${comida.servings}x ` : ''
       return [
@@ -354,39 +357,40 @@ export const generarPDFPlanDietético = async (planInfo, comidas, resumen, pacie
     
     autoTable(doc, {
       startY: yPos,
-      head: [['Comida', 'Cal', 'Prot', 'Carb', 'Gras']],
+      head: [['Alimento', 'Cal', 'Prot', 'Carb', 'Gras']],
       body: rows,
       theme: 'striped',
-      margin: { left: 15, right: 15 },
+      margin: { left: 12, right: 12 },
       headStyles: {
         fillColor: color,
         textColor: [255, 255, 255],
         fontStyle: 'bold',
-        fontSize: 8,
+        fontSize: 7.5,
         halign: 'center',
-        cellPadding: 2
+        cellPadding: 1.5
       },
       styles: {
-        fontSize: 8,
-        cellPadding: 2,
-        textColor: colorTexto
+        fontSize: 7.5,
+        cellPadding: 1.8,
+        textColor: colorTexto,
+        lineWidth: 0.1,
+        lineColor: [230, 230, 230]
       },
       alternateRowStyles: {
-        fillColor: [252, 252, 252]
+        fillColor: [250, 250, 250]
       },
       columnStyles: {
-        0: { cellWidth: 90, fontStyle: 'bold' },
-        1: { cellWidth: 22, halign: 'center' },
-        2: { cellWidth: 22, halign: 'center' },
-        3: { cellWidth: 22, halign: 'center' },
-        4: { cellWidth: 22, halign: 'center' }
-      },
-      margin: { left: 20, right: 20 }
+        0: { cellWidth: 100, fontStyle: 'bold', fontSize: 7.5 },
+        1: { cellWidth: 18, halign: 'center' },
+        2: { cellWidth: 18, halign: 'center' },
+        3: { cellWidth: 18, halign: 'center' },
+        4: { cellWidth: 18, halign: 'center' }
+      }
     })
     
-    yPos = doc.lastAutoTable.finalY + 12
+    yPos = doc.lastAutoTable.finalY + 4
     
-    // Agregar detalles de comidas con diseño mejorado
+    // Agregar detalles de comidas con diseño ultra compacto y moderno
     console.log(`📝 Procesando ${comidasTipo.length} comidas para detalles`)
     comidasTipo.forEach((comida, index) => {
       console.log(`  Comida ${index + 1} - ESTRUCTURA COMPLETA:`, comida)
@@ -396,7 +400,6 @@ export const generarPDFPlanDietético = async (planInfo, comidas, resumen, pacie
         description: comida.description,
         ingredients: comida.ingredients,
         instructions: comida.instructions,
-        // Campos alternativos que podrían existir
         foodDescription: comida.foodDescription,
         foodIngredients: comida.foodIngredients,
         foodInstructions: comida.foodInstructions,
@@ -406,160 +409,212 @@ export const generarPDFPlanDietético = async (planInfo, comidas, resumen, pacie
       
       if (comida.description || comida.ingredients || comida.instructions || 
           comida.foodDescription || comida.foodIngredients || comida.foodInstructions) {
-        // Verificar espacio - más conservador
-        if (yPos > 240) {
+        // Verificar espacio de forma más eficiente
+        if (yPos > 250) {
           doc.addPage()
-          yPos = 20
+          yPos = 15
         }
         
-        // Título de la comida
+        // Título de la comida más compacto
         doc.setTextColor(...colorVerde)
         doc.setFont('helvetica', 'bold')
-        doc.setFontSize(10)
+        doc.setFontSize(8)
         const servings = comida.servings > 1 ? `${comida.servings}x ` : ''
-        doc.text(`> ${servings}${comida.mealName}`, 25, yPos)
-        yPos += 6
+        doc.text(`${servings}${comida.mealName}`, 20, yPos)
+        yPos += 4.5
         
         doc.setTextColor(...colorTexto)
         doc.setFont('helvetica', 'normal')
-        doc.setFontSize(9)
+        doc.setFontSize(7.5)
         
-        // Descripción (de la comida en el plan)
+        // Descripción compacta
         const descripcion = comida.description || comida.foodDescription
         if (descripcion) {
-          const descripcionLines = doc.splitTextToSize(descripcion, 165)
-          // Verificar si cabe en la página
-          if (yPos + (descripcionLines.length * 5) > 280) {
+          const descripcionLines = doc.splitTextToSize(descripcion, 173)
+          if (yPos + (descripcionLines.length * 3.5) > 275) {
             doc.addPage()
-            yPos = 20
+            yPos = 15
           }
-          doc.text(descripcionLines, 28, yPos)
-          yPos += (descripcionLines.length * 5) + 2
+          doc.text(descripcionLines, 23, yPos)
+          yPos += (descripcionLines.length * 3.5) + 1.5
         }
         
-        // Ingredientes (del alimento en la base de datos)
+        // Ingredientes compactos
         const ingredientes = comida.ingredients || comida.foodIngredients
         if (ingredientes) {
-          // Verificar espacio
-          if (yPos > 260) {
+          if (yPos > 265) {
             doc.addPage()
-            yPos = 20
+            yPos = 15
           }
           
           doc.setTextColor(...colorAzul)
           doc.setFont('helvetica', 'bold')
-          doc.setFontSize(8)
-          doc.text('INGREDIENTES:', 28, yPos)
-          yPos += 5
+          doc.setFontSize(7)
+          doc.text('Ingredientes:', 23, yPos)
+          yPos += 3.5
           
           doc.setTextColor(...colorTexto)
           doc.setFont('helvetica', 'normal')
-          const ingredientesLines = doc.splitTextToSize(ingredientes, 160)
+          const ingredientesLines = doc.splitTextToSize(ingredientes, 170)
           
-          // Verificar si cabe
-          if (yPos + (ingredientesLines.length * 4) > 280) {
+          if (yPos + (ingredientesLines.length * 3.2) > 275) {
             doc.addPage()
-            yPos = 20
+            yPos = 15
           }
           
-          doc.text(ingredientesLines, 31, yPos)
-          yPos += (ingredientesLines.length * 4) + 2
+          doc.text(ingredientesLines, 26, yPos)
+          yPos += (ingredientesLines.length * 3.2) + 1.5
         }
         
-        // Instrucciones (del alimento en la base de datos)
+        // Instrucciones compactas
         const instrucciones = comida.instructions || comida.foodInstructions
         if (instrucciones) {
-          // Verificar espacio
-          if (yPos > 260) {
+          if (yPos > 265) {
             doc.addPage()
-            yPos = 20
+            yPos = 15
           }
           
           doc.setTextColor(...colorAzul)
           doc.setFont('helvetica', 'bold')
-          doc.setFontSize(8)
-          doc.text('PREPARACION:', 28, yPos)
-          yPos += 5
+          doc.setFontSize(7)
+          doc.text('Preparacion:', 23, yPos)
+          yPos += 3.5
           
           doc.setTextColor(...colorTexto)
           doc.setFont('helvetica', 'normal')
-          const instruccionesLines = doc.splitTextToSize(instrucciones, 160)
+          const instruccionesLines = doc.splitTextToSize(instrucciones, 170)
           
-          // Verificar si cabe
-          if (yPos + (instruccionesLines.length * 4) > 280) {
+          if (yPos + (instruccionesLines.length * 3.2) > 275) {
             doc.addPage()
-            yPos = 20
+            yPos = 15
           }
           
-          doc.text(instruccionesLines, 31, yPos)
-          yPos += (instruccionesLines.length * 4) + 2
+          doc.text(instruccionesLines, 26, yPos)
+          yPos += (instruccionesLines.length * 3.2) + 1.5
         }
         
-        // Línea separadora sutil
-        if (yPos < 270) {
-          doc.setDrawColor(230, 230, 230)
-          doc.setLineWidth(0.3)
-          doc.line(25, yPos + 2, 190, yPos + 2)
-          yPos += 8
-        } else {
+        // Línea separadora ultra sutil
+        if (yPos < 268) {
+          doc.setDrawColor(240, 240, 240)
+          doc.setLineWidth(0.2)
+          doc.line(18, yPos + 1, 192, yPos + 1)
           yPos += 4
+        } else {
+          yPos += 2
         }
       }
     })
     
-    yPos += 8
+    yPos += 3
   })
   
-  // ============ PIE DE PÁGINA MEJORADO ============
+  // ============ SECCIÓN DE FIRMA (ÚLTIMA PÁGINA) ============
   const totalPages = doc.internal.getNumberOfPages()
+  doc.setPage(totalPages)
   
+  // Verificar si hay espacio en la última página
+  if (yPos < 240) {
+    // Hay espacio en la página actual
+  } else {
+    // Agregar nueva página para la firma
+    doc.addPage()
+    yPos = 20
+  }
+  
+  // Agregar espacio antes de la firma
+  yPos = Math.max(yPos + 10, 220)
+  
+  // Línea para la firma
+  doc.setDrawColor(100, 100, 100)
+  doc.setLineWidth(0.5)
+  doc.line(70, yPos, 140, yPos)
+  
+  // Texto "Firma del Nutriólogo"
+  yPos += 5
+  doc.setTextColor(80, 80, 80)
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(9)
+  doc.text('Firma del Nutriólogo', 105, yPos, { align: 'center' })
+  
+  // Nombre del nutriólogo
+  if (nutricionistaInfo && (nutricionistaInfo.firstName || nutricionistaInfo.lastName)) {
+    yPos += 5
+    const nombreCompleto = `${nutricionistaInfo.firstName || ''} ${nutricionistaInfo.lastName || ''}`.trim()
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.setTextColor(...colorVerde)
+    doc.text(nombreCompleto, 105, yPos, { align: 'center' })
+    
+    // Cédula profesional si existe
+    if (nutricionistaInfo.professionalLicense) {
+      yPos += 4
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(8)
+      doc.setTextColor(100, 100, 100)
+      doc.text(`Cédula Profesional: ${nutricionistaInfo.professionalLicense}`, 105, yPos, { align: 'center' })
+    }
+  }
+  
+  // ============ PIE DE PÁGINA MODERNO Y COMPACTO ============
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i)
     
-    // Línea decorativa superior del pie
-    doc.setDrawColor(200, 200, 200)
-    doc.setLineWidth(0.5)
-    doc.line(20, 280, 190, 280)
+    // Línea decorativa superior del pie con gradiente visual
+    doc.setDrawColor(...colorVerde)
+    doc.setLineWidth(0.8)
+    doc.line(15, 281, 195, 281)
     
-    // Número de página
-    doc.setFontSize(8)
+    // Barra de color sutil
+    doc.setFillColor(248, 248, 248)
+    doc.rect(0, 282, 210, 15, 'F')
+    
+    // Número de página (izquierda)
+    doc.setFontSize(7)
     doc.setTextColor(...colorGris)
     doc.setFont('helvetica', 'normal')
     doc.text(
-      `Pagina ${i} de ${totalPages}`,
-      105,
-      286,
-      { align: 'center' }
+      `Página ${i} de ${totalPages}`,
+      18,
+      287
     )
     
-    // Nombre del sistema
+    // Nombre del sistema (centro) - más destacado
     doc.setFont('helvetica', 'bold')
+    doc.setFontSize(8.5)
     doc.setTextColor(...colorVerde)
     doc.text(
       'NUTRITRACK',
       105,
-      291,
+      286.5,
       { align: 'center' }
     )
     
-    // Subtítulo
+    // Subtítulo (centro)
     doc.setFont('helvetica', 'normal')
-    doc.setFontSize(7)
+    doc.setFontSize(6.5)
     doc.setTextColor(...colorGris)
     doc.text(
-      'Sistema de Gestion Nutricional',
+      'Sistema de Gestión Nutricional',
       105,
-      295,
+      290.5,
       { align: 'center' }
     )
     
-    // Página web
-    doc.setFontSize(7)
+    // Información de contacto (derecha)
+    doc.setFontSize(6.5)
     doc.setTextColor(...colorAzul)
     doc.text(
       'www.nutritrack.com',
-      195,
-      295,
+      192,
+      287,
+      { align: 'right' }
+    )
+    
+    doc.setTextColor(...colorGris)
+    doc.text(
+      'contacto@nutritrack.com',
+      192,
+      290.5,
       { align: 'right' }
     )
   }

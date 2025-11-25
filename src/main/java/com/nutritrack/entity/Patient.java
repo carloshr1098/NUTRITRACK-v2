@@ -72,6 +72,9 @@ public class Patient {
     @Column(name = "emergency_contact_phone")
     private String emergencyContactPhone;
     
+    @Column(name = "health_goal")
+    private String healthGoal;
+    
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
@@ -151,6 +154,9 @@ public class Patient {
     
     public String getEmergencyContactPhone() { return emergencyContactPhone; }
     public void setEmergencyContactPhone(String emergencyContactPhone) { this.emergencyContactPhone = emergencyContactPhone; }
+    
+    public String getHealthGoal() { return healthGoal; }
+    public void setHealthGoal(String healthGoal) { this.healthGoal = healthGoal; }
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

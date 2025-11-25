@@ -1,19 +1,23 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col cols="12">
-        <h2 class="text-h4 mb-4">
-          <v-icon class="mr-2">mdi-calendar-plus</v-icon>
-          Gestión de Citas
-        </h2>
-      </v-col>
-    </v-row>
+  <div class="appointments-container">
+    <!-- Header elegante -->
+    <div class="appointments-header">
+      <div class="header-content">
+        <div class="header-icon">📅</div>
+        <div class="header-text">
+          <h1 class="header-title">Gestión de Citas</h1>
+          <p class="header-subtitle">Programar y gestionar citas médicas</p>
+        </div>
+      </div>
+    </div>
+
+  <v-container class="appointments-content">
 
     <!-- Formulario para nueva cita -->
     <v-row>
       <v-col cols="12" md="6">
-        <v-card elevation="2">
-          <v-card-title class="bg-green text-white">
+        <v-card elevation="3" class="modern-card form-card">
+          <v-card-title class="card-header-green">
             <v-icon class="mr-2">mdi-plus</v-icon>
             Nueva Cita
           </v-card-title>
@@ -93,8 +97,8 @@
 
       <!-- Citas de hoy -->
       <v-col cols="12" md="6">
-        <v-card elevation="2">
-          <v-card-title class="bg-blue text-white">
+        <v-card elevation="3" class="modern-card today-card">
+          <v-card-title class="card-header-blue">
             <v-icon class="mr-2">mdi-calendar-today</v-icon>
             Citas de Hoy
           </v-card-title>
@@ -141,8 +145,8 @@
     <!-- Lista completa de citas -->
     <v-row class="mt-4">
       <v-col cols="12">
-        <v-card elevation="2">
-          <v-card-title class="bg-orange text-white d-flex justify-space-between align-center">
+        <v-card elevation="3" class="modern-card list-card">
+          <v-card-title class="card-header-orange d-flex justify-space-between align-center">
             <span>
               <v-icon class="mr-2">mdi-calendar-multiple</v-icon>
               Todas las Citas
@@ -357,6 +361,15 @@
       {{ notificacion.mensaje }}
     </v-snackbar>
   </v-container>
+
+  <!-- Botón de volver -->
+  <div class="back-button-container">
+    <router-link to="/dashboard" class="btn-back">
+      <span class="btn-icon">←</span>
+      Volver al Dashboard
+    </router-link>
+  </div>
+  </div>
 </template>
 
 <script>
@@ -974,7 +987,263 @@ export default {
 </script>
 
 <style scoped>
+/* Container principal */
+.appointments-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafb 0%, #e8f4f8 100%);
+  position: relative;
+  padding-bottom: 60px;
+}
+
+.appointments-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(95, 194, 198, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.appointments-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 30px;
+}
+
+/* Header */
+.appointments-header {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  padding: 40px 30px;
+  box-shadow: 0 8px 32px rgba(139, 195, 74, 0.3);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.appointments-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.header-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+.header-text {
+  flex: 1;
+}
+
+.header-title {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header-subtitle {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Cards modernas */
+.modern-card {
+  border-radius: 20px !important;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-left: 5px solid #8bc34a;
+}
+
+.modern-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(139, 195, 74, 0.2) !important;
+}
+
+.form-card {
+  border-left-color: #2196F3;
+}
+
+.today-card {
+  border-left-color: #5fc2c6;
+}
+
+.list-card {
+  border-left-color: #ff9800;
+}
+
+/* Headers de cards */
+.card-header-green {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%) !important;
+  color: white !important;
+  padding: 20px 24px !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+}
+
+.card-header-blue {
+  background: linear-gradient(135deg, #5fc2c6 0%, #4fb3b7 100%) !important;
+  color: white !important;
+  padding: 20px 24px !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+}
+
+.card-header-orange {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+  color: white !important;
+  padding: 20px 24px !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+}
+
+/* Botones mejorados */
+:deep(.v-btn) {
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+}
+
+:deep(.v-btn.bg-green) {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%) !important;
+}
+
+:deep(.v-btn.bg-green:hover) {
+  background: linear-gradient(135deg, #7ab73f 0%, #689f38 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 195, 74, 0.4) !important;
+}
+
+/* Campos de formulario */
+:deep(.v-input) {
+  margin-bottom: 8px;
+}
+
+:deep(.v-field) {
+  border-radius: 12px !important;
+}
+
+:deep(.v-field:hover) {
+  background: rgba(139, 195, 74, 0.05);
+}
+
+/* Chips */
+:deep(.v-chip) {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+/* Lista items */
+:deep(.v-list-item) {
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+:deep(.v-list-item:hover) {
+  background: linear-gradient(90deg, rgba(139, 195, 74, 0.08) 0%, transparent 100%) !important;
+  border-left-color: #8bc34a;
+  padding-left: 20px !important;
+}
+
+/* Avatars */
+:deep(.v-avatar) {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Data table */
+:deep(.v-table) {
+  border-radius: 16px !important;
+}
+
+:deep(.v-table th) {
+  background: #f8fafb !important;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+}
+
+:deep(.v-table tr:hover) {
+  background: linear-gradient(90deg, rgba(139, 195, 74, 0.05) 0%, transparent 100%) !important;
+}
+
+/* Botón de volver */
+.back-button-container {
+  max-width: 1400px;
+  margin: 40px auto 0;
+  padding: 0 30px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #7a7a5a 0%, #6a6a4a 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(122, 122, 90, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-back:hover {
+  background: linear-gradient(135deg, #6a6a4a 0%, #5a5a3a 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(122, 122, 90, 0.4);
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
 .border-b {
   border-bottom: 1px solid #e0e0e0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .appointments-header {
+    padding: 30px 20px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header-title {
+    font-size: 2rem;
+  }
 }
 </style>

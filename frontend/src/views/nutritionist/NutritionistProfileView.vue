@@ -1,19 +1,26 @@
 <template>
-  <v-container fluid>
-    <v-card class="mx-auto" max-width="800">
-      <v-card-title class="text-h5 bg-green-lighten-1 white--text">
-        <v-icon left color="white">mdi-account-circle</v-icon>
-        Mi Perfil Profesional
-      </v-card-title>
+  <div class="profile-container">
+    <!-- Header elegante -->
+    <div class="profile-header">
+      <div class="header-content">
+        <div class="header-icon">👤</div>
+        <div class="header-text">
+          <h1 class="header-title">Mi Perfil Profesional</h1>
+          <p class="header-subtitle">Actualiza tu información personal y profesional</p>
+        </div>
+      </div>
+    </div>
 
+  <v-container fluid class="profile-content">
+    <v-card class="mx-auto modern-card profile-card" max-width="900">
       <v-card-text class="pa-6">
         <v-form ref="form" v-model="valid" lazy-validation>
           <!-- Información Personal -->
           <v-row>
             <v-col cols="12">
-              <div class="text-h6 mb-4 text-green-darken-2">
-                <v-icon left>mdi-account</v-icon>
-                Información Personal
+              <div class="section-title">
+                <div class="section-icon">📋</div>
+                <span>Información Personal</span>
               </div>
             </v-col>
 
@@ -67,12 +74,12 @@
           <!-- Información Profesional -->
           <v-row>
             <v-col cols="12">
-              <div class="text-h6 mb-4 text-green-darken-2">
-                <v-icon left>mdi-school</v-icon>
-                Información Profesional
+              <div class="section-title">
+                <div class="section-icon">🎓</div>
+                <span>Información Profesional</span>
               </div>
-              <v-alert type="info" variant="tonal" density="compact" class="mb-4">
-                Esta información aparecerá en los PDFs generados (planes dietéticos y fichas médicas)
+              <v-alert type="info" variant="tonal" density="compact" class="mb-4 info-alert">
+                💡 Esta información aparecerá en los PDFs generados (planes dietéticos y fichas médicas)
               </v-alert>
             </v-col>
 
@@ -185,11 +192,11 @@
           <!-- Vista Previa -->
           <v-row v-if="perfil.degree || perfil.university || perfil.professionalLicense">
             <v-col cols="12">
-              <div class="text-h6 mb-4 text-green-darken-2">
-                <v-icon left>mdi-file-document</v-icon>
-                Vista Previa en PDFs
+              <div class="section-title">
+                <div class="section-icon">📄</div>
+                <span>Vista Previa en PDFs</span>
               </div>
-              <v-card variant="outlined" class="pa-4 bg-grey-lighten-4">
+              <v-card variant="outlined" class="pa-4 preview-card">
                 <div class="text-caption text-grey-darken-1 mb-2">Encabezado del documento:</div>
                 <div class="font-weight-bold text-body-1">Sistema NutriTrack - Gestión Nutricional</div>
                 <div class="text-body-2 mt-1">Plan Dietético Personalizado / Expediente Médico</div>
@@ -203,7 +210,7 @@
         </v-form>
       </v-card-text>
 
-      <v-card-actions class="pa-4">
+      <v-card-actions class="pa-4 actions-bar">
         <v-spacer></v-spacer>
         <v-btn
           color="primary"
@@ -211,6 +218,7 @@
           :disabled="!valid || !cambiosRealizados"
           @click="guardarPerfil"
           size="large"
+          class="btn-save">
         >
           <v-icon left>mdi-content-save</v-icon>
           Guardar Cambios
@@ -231,6 +239,15 @@
       </template>
     </v-snackbar>
   </v-container>
+
+  <!-- Botón de volver -->
+  <div class="back-button-container">
+    <router-link to="/nutritionist/dashboard" class="btn-back">
+      <span class="btn-icon">←</span>
+      Volver al Dashboard
+    </router-link>
+  </div>
+  </div>
 </template>
 
 <script>
@@ -445,7 +462,254 @@ export default {
 </script>
 
 <style scoped>
-.v-card-title {
+/* Container principal */
+.profile-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafb 0%, #e8f4f8 100%);
+  position: relative;
+  padding-bottom: 60px;
+}
+
+.profile-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(95, 194, 198, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.profile-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 30px;
+}
+
+/* Header elegante */
+.profile-header {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  padding: 40px 30px;
+  box-shadow: 0 8px 32px rgba(139, 195, 74, 0.3);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.header-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.header-text {
+  flex: 1;
+}
+
+.header-title {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header-subtitle {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Card moderna */
+.modern-card {
+  border-radius: 20px !important;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-left: 5px solid #8bc34a;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.profile-card {
+  margin-top: 20px;
+}
+
+/* Títulos de sección */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #8bc34a;
+}
+
+.section-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Alerta de información */
+.info-alert {
+  border-radius: 12px !important;
+  border-left: 4px solid #5fc2c6 !important;
+  background: linear-gradient(90deg, rgba(95, 194, 198, 0.1) 0%, transparent 100%) !important;
+}
+
+/* Card de vista previa */
+.preview-card {
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #f8fafb 0%, #e8f4f8 100%) !important;
+  border: 2px solid #8bc34a !important;
+  box-shadow: 0 4px 12px rgba(139, 195, 74, 0.15) !important;
+}
+
+/* Barra de acciones */
+.actions-bar {
+  background: linear-gradient(180deg, transparent 0%, rgba(139, 195, 74, 0.03) 100%);
+  border-top: 2px solid rgba(139, 195, 74, 0.2);
+}
+
+/* Botón de guardar */
+.btn-save {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  padding: 12px 40px !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-save:hover {
+  background: linear-gradient(135deg, #7ab73f 0%, #689f38 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 195, 74, 0.4) !important;
+}
+
+.btn-save:disabled {
+  opacity: 0.5;
+  transform: none !important;
+}
+
+/* Campos de formulario */
+:deep(.v-field) {
+  border-radius: 12px !important;
+  transition: all 0.2s ease;
+}
+
+:deep(.v-field:hover) {
+  background: rgba(139, 195, 74, 0.05);
+}
+
+:deep(.v-field--focused) {
+  border-color: #8bc34a !important;
+}
+
+:deep(.v-text-field input) {
+  font-weight: 500;
+}
+
+/* Dividers */
+:deep(.v-divider) {
+  border-color: rgba(139, 195, 74, 0.2);
+  border-width: 2px;
+  margin: 30px 0 !important;
+}
+
+/* Botón de volver */
+.back-button-container {
+  max-width: 1400px;
+  margin: 40px auto 0;
+  padding: 0 30px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #7a7a5a 0%, #6a6a4a 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
   font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(122, 122, 90, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-back:hover {
+  background: linear-gradient(135deg, #6a6a4a 0%, #5a5a3a 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(122, 122, 90, 0.4);
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-header {
+    padding: 30px 20px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header-title {
+    font-size: 2rem;
+  }
+  
+  .header-icon {
+    font-size: 3rem;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+  }
 }
 </style>

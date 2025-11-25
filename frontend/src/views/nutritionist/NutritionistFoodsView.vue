@@ -1,66 +1,71 @@
 <template>
-  <v-container fluid>
-    <!-- Header con título y botón agregar -->
-    <v-row class="mb-4">
-      <v-col cols="12" md="8">
-        <h1 class="text-h4 font-weight-bold">
-          <v-icon color="primary" size="large" class="mr-2">mdi-database</v-icon>
-          Base de Datos de Alimentos
-        </h1>
-        <p class="text-subtitle-1 text-grey">
-          Gestiona tu colección personal de alimentos y valores nutricionales
-        </p>
-      </v-col>
-      <v-col cols="12" md="4" class="text-right">
-        <v-btn
-          color="primary"
-          size="large"
-          prepend-icon="mdi-plus"
-          @click="abrirDialogoNuevoAlimento"
-        >
-          Agregar Alimento
-        </v-btn>
-      </v-col>
-    </v-row>
+  <div class="foods-container">
+    <!-- Header elegante -->
+    <div class="foods-header">
+      <div class="header-content">
+        <div class="header-icon">🍽️</div>
+        <div class="header-text">
+          <h1 class="header-title">Base de Datos de Alimentos</h1>
+          <p class="header-subtitle">Gestiona tu colección personal de alimentos y valores nutricionales</p>
+        </div>
+        <div class="header-action">
+          <v-btn
+            color="white"
+            size="large"
+            prepend-icon="mdi-plus"
+            @click="abrirDialogoNuevoAlimento"
+            class="btn-add-food"
+          >
+            Agregar Alimento
+          </v-btn>
+        </div>
+      </div>
+    </div>
+
+  <v-container fluid class="foods-content">
 
     <!-- Estadísticas -->
     <v-row class="mb-4">
       <v-col cols="12" md="3" sm="6">
-        <v-card color="primary" variant="tonal">
+        <v-card class="stat-card stat-card-green">
           <v-card-text>
-            <div class="text-h4 font-weight-bold">{{ totalAlimentos }}</div>
-            <div class="text-subtitle-2">Total de Alimentos</div>
+            <div class="stat-icon">📊</div>
+            <div class="stat-value">{{ totalAlimentos }}</div>
+            <div class="stat-label">Total de Alimentos</div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" md="3" sm="6">
-        <v-card color="success" variant="tonal">
+        <v-card class="stat-card stat-card-blue">
           <v-card-text>
-            <div class="text-h4 font-weight-bold">{{ totalCategorias }}</div>
-            <div class="text-subtitle-2">Categorías</div>
+            <div class="stat-icon">📁</div>
+            <div class="stat-value">{{ totalCategorias }}</div>
+            <div class="stat-label">Categorías</div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" md="3" sm="6">
-        <v-card color="info" variant="tonal">
+        <v-card class="stat-card stat-card-orange">
           <v-card-text>
-            <div class="text-h4 font-weight-bold">{{ alimentosMasUsados }}</div>
-            <div class="text-subtitle-2">Más Usados</div>
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value">{{ alimentosMasUsados }}</div>
+            <div class="stat-label">Más Usados</div>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" md="3" sm="6">
-        <v-card color="warning" variant="tonal">
+        <v-card class="stat-card stat-card-red">
           <v-card-text>
-            <div class="text-h4 font-weight-bold">{{ alimentosRecientes }}</div>
-            <div class="text-subtitle-2">Agregados Hoy</div>
+            <div class="stat-icon">🆕</div>
+            <div class="stat-value">{{ alimentosRecientes }}</div>
+            <div class="stat-label">Agregados Hoy</div>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
     <!-- Búsqueda y filtros -->
-    <v-card class="mb-4">
+    <v-card class="mb-4 modern-card search-card">
       <v-card-text>
         <v-row>
           <v-col cols="12" md="6">
@@ -462,6 +467,15 @@
       {{ notificacion.mensaje }}
     </v-snackbar>
   </v-container>
+
+  <!-- Botón de volver -->
+  <div class="back-button-container">
+    <router-link to="/nutritionist/dashboard" class="btn-back">
+      <span class="btn-icon">←</span>
+      Volver al Dashboard
+    </router-link>
+  </div>
+  </div>
 </template>
 
 <script>
@@ -795,7 +809,333 @@ export default {
 </script>
 
 <style scoped>
-.v-data-table {
-  border-radius: 8px;
+/* Container principal */
+.foods-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafb 0%, #e8f4f8 100%);
+  position: relative;
+  padding-bottom: 60px;
+}
+
+.foods-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(95, 194, 198, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.foods-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 30px;
+}
+
+/* Header elegante */
+.foods-header {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  padding: 40px 30px;
+  box-shadow: 0 8px 32px rgba(139, 195, 74, 0.3);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.foods-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.header-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.header-text {
+  flex: 1;
+}
+
+.header-title {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header-subtitle {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+.header-action {
+  margin-left: auto;
+}
+
+.btn-add-food {
+  background: white !important;
+  color: #8bc34a !important;
+  font-weight: 700 !important;
+  padding: 12px 28px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-add-food:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Tarjetas de estadísticas */
+.stat-card {
+  border-radius: 20px !important;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: none !important;
+  position: relative;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.2) 100%);
+}
+
+.stat-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.stat-card-green {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%) !important;
+  color: white;
+}
+
+.stat-card-blue {
+  background: linear-gradient(135deg, #5fc2c6 0%, #4fb3b7 100%) !important;
+  color: white;
+}
+
+.stat-card-orange {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+  color: white;
+}
+
+.stat-card-red {
+  background: linear-gradient(135deg, #ff5252 0%, #f44336 100%) !important;
+  color: white;
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0.95;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Cards modernas */
+.modern-card {
+  border-radius: 20px !important;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-left: 5px solid #8bc34a;
+}
+
+.modern-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(139, 195, 74, 0.2) !important;
+}
+
+.search-card {
+  border-left-color: #5fc2c6;
+}
+
+/* Tabla mejorada */
+:deep(.v-data-table) {
+  border-radius: 16px !important;
+}
+
+:deep(.v-data-table th) {
+  background: linear-gradient(135deg, #f8fafb 0%, #e8f4f8 100%) !important;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+:deep(.v-data-table tr:hover) {
+  background: linear-gradient(90deg, rgba(139, 195, 74, 0.05) 0%, transparent 100%) !important;
+}
+
+/* Botones mejorados */
+:deep(.v-btn) {
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+}
+
+:deep(.v-btn[color="primary"]) {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%) !important;
+}
+
+:deep(.v-btn[color="primary"]:hover) {
+  background: linear-gradient(135deg, #7ab73f 0%, #689f38 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 195, 74, 0.4) !important;
+}
+
+:deep(.v-btn[color="info"]) {
+  background: linear-gradient(135deg, #5fc2c6 0%, #4fb3b7 100%) !important;
+}
+
+:deep(.v-btn[color="warning"]) {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+}
+
+:deep(.v-btn[color="error"]) {
+  background: linear-gradient(135deg, #ff5252 0%, #f44336 100%) !important;
+}
+
+/* Campos de formulario */
+:deep(.v-field) {
+  border-radius: 12px !important;
+}
+
+:deep(.v-field:hover) {
+  background: rgba(139, 195, 74, 0.05);
+}
+
+/* Chips */
+:deep(.v-chip) {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+/* Diálogos mejorados */
+:deep(.v-dialog .v-card) {
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+
+:deep(.v-dialog .v-card-title) {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 20px 24px;
+}
+
+/* Botón de volver */
+.back-button-container {
+  max-width: 1400px;
+  margin: 40px auto 0;
+  padding: 0 30px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #7a7a5a 0%, #6a6a4a 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(122, 122, 90, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-back:hover {
+  background: linear-gradient(135deg, #6a6a4a 0%, #5a5a3a 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(122, 122, 90, 0.4);
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .foods-header {
+    padding: 30px 20px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header-title {
+    font-size: 2rem;
+  }
+  
+  .header-icon {
+    font-size: 3rem;
+  }
+  
+  .header-action {
+    margin-left: 0;
+  }
 }
 </style>

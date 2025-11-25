@@ -1,13 +1,17 @@
 <template>
-  <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
-    <div style="margin-bottom: 20px;">
-      <button 
-        @click="$router.back()"
-        style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >
-        ← Volver
-      </button>
+  <div class="patient-detail-container">
+    <!-- Header elegante -->
+    <div class="detail-header">
+      <div class="header-content">
+        <div class="header-icon">👤</div>
+        <div class="header-text">
+          <h1 class="header-title">Detalle del Paciente</h1>
+          <p class="header-subtitle">Información completa y registro de peso</p>
+        </div>
+      </div>
     </div>
+
+    <div class="detail-content">
 
     <div v-if="loading" style="text-align: center; padding: 40px;">
       <p>Cargando información del paciente...</p>
@@ -19,14 +23,23 @@
 
     <div v-else-if="paciente">
       <!-- Información básica del paciente -->
-      <div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 25px; margin-bottom: 20px;">
-        <h1 style="margin: 0 0 20px 0; color: #2c3e50;">
-          {{ paciente.firstName }} {{ paciente.lastName }}
-        </h1>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+      <div class="modern-card info-card">
+        <div class="patient-name-header">
+          <div class="patient-avatar-large">
+            {{ paciente.firstName?.[0] }}{{ paciente.lastName?.[0] }}
+          </div>
           <div>
-            <h3 style="margin: 0 0 15px 0; color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 5px;">
+            <h1 class="patient-title">
+              {{ paciente.firstName }} {{ paciente.lastName }}
+            </h1>
+            <span class="patient-id">ID: {{ paciente.id }}</span>
+          </div>
+        </div>
+        
+        <div class="info-grid">
+          <div class="info-section">
+            <h3 class="section-header header-green">
+              <span class="section-icon">📋</span>
               Información Personal
             </h3>
             <p style="margin: 8px 0;"><strong>ID:</strong> {{ paciente.id }}</p>
@@ -37,8 +50,9 @@
             <p style="margin: 8px 0;"><strong>Teléfono:</strong> {{ paciente.phone || 'No especificado' }}</p>
           </div>
 
-          <div>
-            <h3 style="margin: 0 0 15px 0; color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 5px;">
+          <div class="info-section">
+            <h3 class="section-header header-blue">
+              <span class="section-icon">📏</span>
               Medidas Físicas
             </h3>
             <p style="margin: 8px 0;"><strong>Altura:</strong> {{ paciente.height ? paciente.height + ' cm' : 'No especificada' }}</p>
@@ -47,8 +61,9 @@
             <p style="margin: 8px 0;"><strong>Nivel de Actividad:</strong> {{ paciente.activityLevel || 'No especificado' }}</p>
           </div>
 
-          <div>
-            <h3 style="margin: 0 0 15px 0; color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 5px;">
+          <div class="info-section">
+            <h3 class="section-header header-orange">
+              <span class="section-icon">🏥</span>
               Información Médica
             </h3>
             <p style="margin: 8px 0;"><strong>Alergias:</strong> {{ paciente.allergies || 'Ninguna registrada' }}</p>
@@ -57,9 +72,10 @@
           </div>
         </div>
 
-        <div v-if="paciente.emergencyContactName || paciente.emergencyContactPhone" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
-          <h3 style="margin: 0 0 15px 0; color: #dc3545;">
-            🚨 Contacto de Emergencia
+        <div v-if="paciente.emergencyContactName || paciente.emergencyContactPhone" class="emergency-section">
+          <h3 class="section-header header-red">
+            <span class="section-icon">🚨</span>
+            Contacto de Emergencia
           </h3>
           <p style="margin: 8px 0;"><strong>Nombre:</strong> {{ paciente.emergencyContactName || 'No especificado' }}</p>
           <p style="margin: 8px 0;"><strong>Teléfono:</strong> {{ paciente.emergencyContactPhone || 'No especificado' }}</p>
@@ -72,14 +88,18 @@
       </div>
 
       <!-- Historial de Peso -->
-      <div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 25px; margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h2 style="margin: 0; color: #2c3e50;">📊 Historial de Peso</h2>
+      <div class="modern-card weight-card">
+        <div class="card-header-section">
+          <h2 class="card-title">
+            <span class="title-icon">📊</span>
+            Historial de Peso
+          </h2>
           <button 
             @click="mostrarFormularioPeso = !mostrarFormularioPeso"
-            style="padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;"
+            class="btn-action btn-add-weight"
           >
-            {{ mostrarFormularioPeso ? '✖ Cancelar' : '➕ Registrar Peso' }}
+            <span>{{ mostrarFormularioPeso ? '✖' : '➕' }}</span>
+            {{ mostrarFormularioPeso ? 'Cancelar' : 'Registrar Peso' }}
           </button>
         </div>
 
@@ -347,7 +367,7 @@
                 style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
               >
             </div>
-            <div style="grid-column: 1 / -1;">
+            <div>
               <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nivel de Actividad</label>
               <select 
                 v-model="formEdicion.activityLevel" 
@@ -359,6 +379,19 @@
                 <option value="MODERADO">Actividad Moderada</option>
                 <option value="ACTIVO">Activo</option>
                 <option value="MUY_ACTIVO">Muy Activo</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Objetivo de Salud</label>
+              <select 
+                v-model="formEdicion.healthGoal" 
+                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+              >
+                <option value="">Seleccionar...</option>
+                <option value="LOSE_WEIGHT">Bajar peso</option>
+                <option value="MAINTAIN_WEIGHT">Mantener peso</option>
+                <option value="GAIN_WEIGHT">Subir peso</option>
+                <option value="GAIN_MUSCLE">Ganar músculo</option>
               </select>
             </div>
             <div style="grid-column: 1 / -1;">
@@ -430,6 +463,15 @@
         </form>
       </div>
     </div>
+    
+    <!-- Botón de volver -->
+    <div class="back-button-container">
+      <router-link to="/nutritionist/patients" class="btn-back">
+        <span class="btn-icon">←</span>
+        Volver a Pacientes
+      </router-link>
+    </div>
+    </div>
   </div>
 </template>
 
@@ -473,6 +515,7 @@ export default {
         email: '',
         phone: '',
         activityLevel: '',
+        healthGoal: '',
         medicalConditions: '',
         allergies: '',
         dietaryRestrictions: '',
@@ -633,6 +676,7 @@ export default {
         email: this.paciente.email || '',
         phone: this.paciente.phone || '',
         activityLevel: this.paciente.activityLevel || '',
+        healthGoal: this.paciente.healthGoal || '',
         medicalConditions: this.paciente.medicalConditions || '',
         allergies: this.paciente.allergies || '',
         dietaryRestrictions: this.paciente.dietaryRestrictions || '',
@@ -686,61 +730,61 @@ export default {
         
         await generarEncabezadoPDF(doc, 'Expediente Médico del Paciente', nutricionistaInfo)
         
-        let y = 55
+        let y = 52
         
         // ==================== INFORMACIÓN PERSONAL ====================
-        // Caja con borde y fondo
+        // Caja compacta con borde y fondo
         doc.setFillColor(245, 245, 245) // Gris claro
         doc.setDrawColor(76, 175, 80) // Verde
-        doc.setLineWidth(0.5)
-        doc.roundedRect(15, y, 180, 65, 3, 3, 'FD')
+        doc.setLineWidth(0.4)
+        doc.roundedRect(15, y, 180, 40, 2, 2, 'FD')
         
-        // Título de sección con icono
-        y += 8
-        doc.setFontSize(14)
+        // Título de sección compacto
+        y += 5
+        doc.setFontSize(10)
         doc.setFont('helvetica', 'bold')
         doc.setTextColor(76, 175, 80)
         doc.text('INFORMACION PERSONAL', 20, y)
         
-        y += 8
-        doc.setFontSize(10)
+        y += 5
+        doc.setFontSize(7.5)
         doc.setFont('helvetica', 'normal')
         doc.setTextColor(60, 60, 60)
         
-        // Dividir en dos columnas
+        // Dividir en dos columnas compactas
         const col1X = 20
         const col2X = 110
         let yTemp = y
         
         // Columna 1
         doc.setFont('helvetica', 'bold')
-        doc.text('ID Paciente:', col1X, yTemp)
+        doc.text('ID:', col1X, yTemp)
         doc.setFont('helvetica', 'normal')
-        doc.text(String(this.paciente.id), col1X + 25, yTemp)
-        yTemp += 6
+        doc.text(String(this.paciente.id), col1X + 18, yTemp)
+        yTemp += 4
         
         doc.setFont('helvetica', 'bold')
         doc.text('Nombre:', col1X, yTemp)
         doc.setFont('helvetica', 'normal')
-        doc.text(`${this.paciente.firstName} ${this.paciente.lastName}`, col1X + 25, yTemp)
-        yTemp += 6
+        doc.text(`${this.paciente.firstName} ${this.paciente.lastName}`, col1X + 18, yTemp)
+        yTemp += 4
         
         doc.setFont('helvetica', 'bold')
         doc.text('Fecha Nac.:', col1X, yTemp)
         doc.setFont('helvetica', 'normal')
-        doc.text(this.formatearFecha(this.paciente.dateOfBirth), col1X + 25, yTemp)
-        yTemp += 6
+        doc.text(this.formatearFecha(this.paciente.dateOfBirth), col1X + 18, yTemp)
+        yTemp += 4
         
         doc.setFont('helvetica', 'bold')
         doc.text('Edad:', col1X, yTemp)
         doc.setFont('helvetica', 'normal')
-        doc.text(`${this.calcularEdad(this.paciente.dateOfBirth)} años`, col1X + 25, yTemp)
-        yTemp += 6
+        doc.text(`${this.calcularEdad(this.paciente.dateOfBirth)} años`, col1X + 18, yTemp)
+        yTemp += 4
         
         doc.setFont('helvetica', 'bold')
         doc.text('Género:', col1X, yTemp)
         doc.setFont('helvetica', 'normal')
-        doc.text(this.paciente.gender === 'M' ? 'Masculino' : this.paciente.gender === 'F' ? 'Femenino' : 'Otro', col1X + 25, yTemp)
+        doc.text(this.paciente.gender === 'M' ? 'Masculino' : this.paciente.gender === 'F' ? 'Femenino' : 'Otro', col1X + 18, yTemp)
         
         // Columna 2
         yTemp = y
@@ -748,208 +792,243 @@ export default {
           doc.setFont('helvetica', 'bold')
           doc.text('Email:', col2X, yTemp)
           doc.setFont('helvetica', 'normal')
-          doc.text(this.paciente.email.substring(0, 30), col2X + 18, yTemp)
-          yTemp += 6
+          doc.text(this.paciente.email.substring(0, 30), col2X + 13, yTemp)
+          yTemp += 4
         }
         
         if (this.paciente.phone) {
           doc.setFont('helvetica', 'bold')
           doc.text('Teléfono:', col2X, yTemp)
           doc.setFont('helvetica', 'normal')
-          doc.text(this.paciente.phone, col2X + 18, yTemp)
-          yTemp += 6
+          doc.text(this.paciente.phone, col2X + 13, yTemp)
+          yTemp += 4
         }
         
-        y += 58
+        y += 36
         
-        // ==================== MEDIDAS FÍSICAS ====================
-        // Caja con gradiente simulado
+        // ==================== FILA DE 3 COLUMNAS: MEDIDAS + EMERGENCIA + OBJETIVO ====================
+        const yFilaInicio = y
+        
+        // COLUMNA 1: MEDIDAS FÍSICAS
         doc.setFillColor(232, 245, 233) // Verde muy claro
         doc.setDrawColor(76, 175, 80)
-        doc.setLineWidth(0.5)
-        doc.roundedRect(15, y, 85, 42, 3, 3, 'FD')
+        doc.setLineWidth(0.4)
+        doc.roundedRect(15, y, 58, 27, 2, 2, 'FD')
         
-        y += 8
-        doc.setFontSize(14)
+        y += 5
+        doc.setFontSize(9)
         doc.setFont('helvetica', 'bold')
         doc.setTextColor(76, 175, 80)
-        doc.text('MEDIDAS FISICAS', 20, y)
+        doc.text('MEDIDAS FISICAS', 17, y)
         
-        y += 8
-        doc.setFontSize(10)
+        y += 4.5
+        doc.setFontSize(7.5)
         doc.setFont('helvetica', 'normal')
         doc.setTextColor(60, 60, 60)
         
         doc.setFont('helvetica', 'bold')
-        doc.text('Altura:', 20, y)
+        doc.text('Altura:', 17, y)
         doc.setFont('helvetica', 'normal')
-        doc.text(`${this.paciente.height} cm`, 40, y)
-        y += 6
+        doc.text(`${this.paciente.height} cm`, 30, y)
+        y += 4
         
         doc.setFont('helvetica', 'bold')
-        doc.text('Peso:', 20, y)
+        doc.text('Peso:', 17, y)
         doc.setFont('helvetica', 'normal')
-        doc.text(`${this.paciente.currentWeight} kg`, 40, y)
-        y += 6
+        doc.text(`${this.paciente.currentWeight} kg`, 30, y)
+        y += 4
         
         doc.setFont('helvetica', 'bold')
-        doc.text('IMC:', 20, y)
+        doc.text('IMC:', 17, y)
         doc.setFont('helvetica', 'normal')
         const imc = this.calcularIMC()
-        doc.text(imc, 40, y)
-        y += 6
+        doc.text(imc, 30, y)
+        y += 4
         
         const niveles = {
           'SEDENTARY': 'Sedentario',
-          'LIGHTLY_ACTIVE': 'Ligeramente Activo',
-          'MODERATELY_ACTIVE': 'Moderadamente Activo',
+          'LIGHTLY_ACTIVE': 'Lig. Activo',
+          'MODERATELY_ACTIVE': 'Mod. Activo',
           'VERY_ACTIVE': 'Muy Activo',
-          'EXTRA_ACTIVE': 'Extremadamente Activo'
+          'EXTRA_ACTIVE': 'Extra Activo'
         }
         doc.setFont('helvetica', 'bold')
-        doc.text('Actividad:', 20, y)
+        doc.text('Actividad:', 17, y)
         doc.setFont('helvetica', 'normal')
         const actividadTexto = niveles[this.paciente.activityLevel] || this.paciente.activityLevel
-        doc.text(actividadTexto.substring(0, 18), 40, y)
+        doc.text(actividadTexto.substring(0, 11), 30, y)
         
-        y -= 26 // Volver arriba para la caja de al lado
-        y -= 26 // Volver arriba para la caja de al lado
-        
-        // ==================== CONTACTO DE EMERGENCIA (al lado) ====================
+        // COLUMNA 2: CONTACTO DE EMERGENCIA
+        y = yFilaInicio
         if (this.paciente.emergencyContactName || this.paciente.emergencyContactPhone) {
           doc.setFillColor(255, 243, 224) // Naranja muy claro
           doc.setDrawColor(255, 152, 0) // Naranja
-          doc.setLineWidth(0.5)
-          doc.roundedRect(110, y, 85, 42, 3, 3, 'FD')
+          doc.setLineWidth(0.4)
+          doc.roundedRect(78, y, 58, 27, 2, 2, 'FD')
           
-          y += 8
-          doc.setFontSize(14)
+          y += 5
+          doc.setFontSize(9)
           doc.setFont('helvetica', 'bold')
           doc.setTextColor(255, 152, 0)
-          doc.text('EMERGENCIA', 115, y)
+          doc.text('EMERGENCIA', 80, y)
           
-          y += 8
-          doc.setFontSize(10)
+          y += 4.5
+          doc.setFontSize(7)
           doc.setFont('helvetica', 'normal')
           doc.setTextColor(60, 60, 60)
           
           if (this.paciente.emergencyContactName) {
             doc.setFont('helvetica', 'bold')
-            doc.text('Contacto:', 115, y)
+            doc.text('Contacto:', 80, y)
             doc.setFont('helvetica', 'normal')
-            doc.text(this.paciente.emergencyContactName.substring(0, 20), 115, y + 6)
-            y += 12
+            // Dividir en múltiples líneas si es necesario
+            const nombreLineas = doc.splitTextToSize(this.paciente.emergencyContactName, 52)
+            doc.text(nombreLineas, 80, y + 3.5)
+            y += 3.5 + (nombreLineas.length * 3.5) + 0.5
           }
           
           if (this.paciente.emergencyContactPhone) {
             doc.setFont('helvetica', 'bold')
-            doc.text('Teléfono:', 115, y)
+            doc.text('Teléfono:', 80, y)
             doc.setFont('helvetica', 'normal')
-            doc.text(this.paciente.emergencyContactPhone, 115, y + 6)
+            doc.text(this.paciente.emergencyContactPhone, 80, y + 3.5)
           }
-          
-          y += 20
-        } else {
-          y += 42
         }
         
-        y += 10
+        // COLUMNA 3: OBJETIVO/META
+        y = yFilaInicio
+        doc.setFillColor(227, 242, 253) // Azul muy claro
+        doc.setDrawColor(33, 150, 243) // Azul
+        doc.setLineWidth(0.4)
+        doc.roundedRect(141, y, 54, 27, 2, 2, 'FD')
         
-        // ==================== INFORMACIÓN MÉDICA ====================
-        doc.setFillColor(255, 245, 245) // Rojo muy claro
-        doc.setDrawColor(244, 67, 54) // Rojo
-        doc.setLineWidth(0.5)
-        doc.roundedRect(15, y, 180, 90, 3, 3, 'FD')
-        
-        y += 8
-        doc.setFontSize(14)
+        y += 5
+        doc.setFontSize(9)
         doc.setFont('helvetica', 'bold')
-        doc.setTextColor(244, 67, 54)
-        doc.text('INFORMACION MEDICA', 20, y)
-        y += 10
+        doc.setTextColor(33, 150, 243)
+        doc.text('OBJETIVO', 143, y)
         
-        doc.setFontSize(10)
+        y += 4.5
+        doc.setFontSize(7.5)
         doc.setFont('helvetica', 'normal')
         doc.setTextColor(60, 60, 60)
         
+        const objetivos = {
+          'LOSE_WEIGHT': 'Bajar peso',
+          'MAINTAIN_WEIGHT': 'Mantener',
+          'GAIN_WEIGHT': 'Subir peso',
+          'GAIN_MUSCLE': 'Ganar músculo'
+        }
+        
+        doc.setFont('helvetica', 'bold')
+        doc.text('Meta:', 143, y)
+        doc.setFont('helvetica', 'normal')
+        const metaTexto = objetivos[this.paciente.healthGoal] || this.paciente.healthGoal || 'No definido'
+        doc.text(metaTexto.substring(0, 13), 143, y + 4)
+        
+        y = yFilaInicio + 31
+        
+        // ==================== INFORMACIÓN MÉDICA (2 COLUMNAS) ====================
+        doc.setFillColor(255, 245, 245) // Rojo muy claro
+        doc.setDrawColor(244, 67, 54) // Rojo
+        doc.setLineWidth(0.4)
+        doc.roundedRect(15, y, 180, 42, 2, 2, 'FD')
+        
+        y += 5
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(244, 67, 54)
+        doc.text('INFORMACION MEDICA', 20, y)
+        y += 5
+        
+        doc.setFontSize(7.5)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(60, 60, 60)
+        
+        const yMedicaInicio = y
+        
+        // COLUMNA IZQUIERDA
         // Condiciones Médicas
         doc.setFont('helvetica', 'bold')
         doc.setTextColor(244, 67, 54)
-        doc.text('* Condiciones Medicas:', 20, y)
-        y += 5
+        doc.text('Condiciones Medicas:', 20, y)
+        y += 3.5
         doc.setFont('helvetica', 'normal')
         doc.setTextColor(60, 60, 60)
         
         if (this.paciente.medicalConditions) {
-          const condiciones = doc.splitTextToSize(this.paciente.medicalConditions, 165)
-          doc.text(condiciones, 23, y)
-          y += (condiciones.length * 5) + 3
+          const condiciones = doc.splitTextToSize(this.paciente.medicalConditions, 80)
+          doc.text(condiciones, 22, y)
+          y += (condiciones.length * 3.5) + 1.5
         } else {
           doc.setTextColor(150, 150, 150)
-          doc.text('Sin condiciones registradas', 23, y)
+          doc.text('Sin condiciones', 22, y)
           doc.setTextColor(60, 60, 60)
-          y += 8
+          y += 4.5
         }
         
         // Alergias
         doc.setFont('helvetica', 'bold')
         doc.setTextColor(244, 67, 54)
-        doc.text('* Alergias:', 20, y)
-        y += 5
+        doc.text('Alergias:', 20, y)
+        y += 3.5
         doc.setFont('helvetica', 'normal')
         doc.setTextColor(60, 60, 60)
         
         if (this.paciente.allergies) {
-          const alergias = doc.splitTextToSize(this.paciente.allergies, 165)
-          doc.text(alergias, 23, y)
-          y += (alergias.length * 5) + 3
+          const alergias = doc.splitTextToSize(this.paciente.allergies, 80)
+          doc.text(alergias, 22, y)
         } else {
           doc.setTextColor(150, 150, 150)
-          doc.text('Sin alergias registradas', 23, y)
+          doc.text('Sin alergias', 22, y)
           doc.setTextColor(60, 60, 60)
-          doc.setTextColor(150, 150, 150)
-          doc.text('Sin alergias registradas', 23, y)
-          doc.setTextColor(60, 60, 60)
-          y += 8
         }
+        
+        // COLUMNA DERECHA
+        y = yMedicaInicio
         
         // Restricciones Dietéticas
         doc.setFont('helvetica', 'bold')
         doc.setTextColor(244, 67, 54)
-        doc.text('* Restricciones Dieteticas:', 20, y)
-        y += 5
+        doc.text('Restricciones Dieteticas:', 107, y)
+        y += 3.5
         doc.setFont('helvetica', 'normal')
         doc.setTextColor(60, 60, 60)
         
         if (this.paciente.dietaryRestrictions) {
-          const restricciones = doc.splitTextToSize(this.paciente.dietaryRestrictions, 165)
-          doc.text(restricciones, 23, y)
-          y += (restricciones.length * 5) + 5
+          const restricciones = doc.splitTextToSize(this.paciente.dietaryRestrictions, 80)
+          doc.text(restricciones, 109, y)
+          y += (restricciones.length * 3.5) + 1.5
         } else {
           doc.setTextColor(150, 150, 150)
-          doc.text('Sin restricciones registradas', 23, y)
+          doc.text('Sin restricciones', 109, y)
           doc.setTextColor(60, 60, 60)
-          y += 10
+          y += 4.5
         }
         
-        y += 5
+        // Notas adicionales
+        if (this.paciente.notes) {
+          doc.setFont('helvetica', 'bold')
+          doc.setTextColor(244, 67, 54)
+          doc.text('Notas:', 107, y)
+          y += 3.5
+          doc.setFont('helvetica', 'normal')
+          doc.setTextColor(60, 60, 60)
+          const notas = doc.splitTextToSize(this.paciente.notes, 80)
+          doc.text(notas, 109, y)
+        }
+        
+        y = yMedicaInicio + 46
         
         // ==================== GRÁFICA DE PESO (Nueva Página) ====================
         if (this.weightRecords && this.weightRecords.length > 0 && this.$refs.weightChart) {
           // Nueva página para la gráfica
           doc.addPage()
-          y = 20
           
-          // Banner verde para la segunda página
-          doc.setFillColor(76, 175, 80)
-          doc.rect(0, 0, 210, 15, 'F')
-          doc.setFontSize(16)
-          doc.setFont('helvetica', 'bold')
-          doc.setTextColor(255, 255, 255)
-          doc.text('EVOLUCION DEL PESO', 105, 10, { align: 'center' })
+          // Encabezado en la segunda página (igual que la primera)
+          await generarEncabezadoPDF(doc, 'Evolución del Peso', nutricionistaInfo)
           
-          y = 25
-          y = 25
+          y = 52
           
           try {
             // Obtener el canvas de Chart.js
@@ -957,32 +1036,33 @@ export default {
             const canvas = chartComponent.$el.querySelector('canvas')
             
             if (canvas) {
-              // Caja con sombra para la gráfica
+              // Caja compacta para la gráfica
               doc.setFillColor(255, 255, 255)
               doc.setDrawColor(200, 200, 200)
-              doc.setLineWidth(0.5)
-              doc.roundedRect(15, y, 180, 115, 3, 3, 'FD')
+              doc.setLineWidth(0.4)
+              doc.roundedRect(15, y, 180, 105, 2, 2, 'FD')
               
-              y += 5
+              y += 3
               
               // Convertir el canvas a imagen base64
               const imgData = canvas.toDataURL('image/png', 1.0)
               
               // Agregar la imagen al PDF (centrada en la caja)
-              const imgWidth = 170
-              const imgHeight = 105
+              const imgWidth = 174
+              const imgHeight = 99
               const imgX = (210 - imgWidth) / 2
               
               doc.addImage(imgData, 'PNG', imgX, y, imgWidth, imgHeight)
-              y += imgHeight + 15
+              y += imgHeight + 8
               
               // ==================== TABLA DE REGISTROS ====================
-              doc.setFillColor(245, 245, 245)
+              doc.setFillColor(232, 245, 233)
               doc.setDrawColor(76, 175, 80)
-              doc.roundedRect(15, y, 180, 10, 2, 2, 'FD')
+              doc.setLineWidth(0.4)
+              doc.roundedRect(15, y, 180, 8, 2, 2, 'FD')
               
-              y += 7
-              doc.setFontSize(12)
+              y += 5.5
+              doc.setFontSize(10)
               doc.setFont('helvetica', 'bold')
               doc.setTextColor(76, 175, 80)
               doc.text('Detalle de Registros', 20, y)
@@ -990,10 +1070,10 @@ export default {
               y += 8
               
               // Encabezados de la tabla con fondo
-              doc.setFillColor(232, 245, 233)
-              doc.rect(15, y - 5, 180, 8, 'F')
+              doc.setFillColor(245, 245, 245)
+              doc.rect(15, y - 4, 180, 6, 'F')
               
-              doc.setFontSize(9)
+              doc.setFontSize(7.5)
               doc.setFont('helvetica', 'bold')
               doc.setTextColor(60, 60, 60)
               doc.text('Fecha', 20, y)
@@ -1003,27 +1083,26 @@ export default {
               
               y += 6
               doc.setFont('helvetica', 'normal')
-              doc.setFontSize(8)
               
-              // Línea divisoria
-              doc.setDrawColor(200, 200, 200)
-              doc.setLineWidth(0.3)
-              doc.line(15, y - 2, 195, y - 2)
+              y += 1
               
-              // Registros (mostrar los últimos 15)
-              const registrosParaMostrar = this.weightRecords.slice(-15)
+              // Registros (mostrar los últimos 20 con espacio compacto)
+              const registrosParaMostrar = this.weightRecords.slice(-20)
               let alternarColor = false
               
-              registrosParaMostrar.forEach((record, index) => {
-                if (y > 270) {
+              for (let index = 0; index < registrosParaMostrar.length; index++) {
+                const record = registrosParaMostrar[index]
+                
+                if (y > 268) {
                   doc.addPage()
-                  y = 20
+                  await generarEncabezadoPDF(doc, 'Evolución del Peso (continuación)', nutricionistaInfo)
+                  y = 56
                 }
                 
                 // Alternar color de fondo para filas
                 if (alternarColor) {
-                  doc.setFillColor(250, 250, 250)
-                  doc.rect(15, y - 4, 180, 6, 'F')
+                  doc.setFillColor(252, 252, 252)
+                  doc.rect(15, y - 3, 180, 4.5, 'F')
                 }
                 alternarColor = !alternarColor
                 
@@ -1035,7 +1114,7 @@ export default {
                 // Calcular diferencia con el registro anterior
                 if (index > 0) {
                   const diff = record.weight - registrosParaMostrar[index - 1].weight
-                  const diffText = diff > 0 ? `^ +${diff.toFixed(1)}` : `v ${diff.toFixed(1)}`
+                  const diffText = diff > 0 ? `+${diff.toFixed(1)}` : `${diff.toFixed(1)}`
                   
                   // Color según aumento o disminución
                   if (diff > 0) {
@@ -1049,80 +1128,109 @@ export default {
                 
                 // Notas (truncadas si son muy largas)
                 if (record.notes) {
-                  const notasTruncadas = record.notes.substring(0, 22) + (record.notes.length > 22 ? '...' : '')
+                  const notasTruncadas = record.notes.substring(0, 25) + (record.notes.length > 25 ? '...' : '')
                   doc.setTextColor(100, 100, 100)
                   doc.text(notasTruncadas, 140, y)
                   doc.setTextColor(60, 60, 60)
                 }
                 
-                y += 6
-              })
+                y += 4.5
+              }
+              
+              // Espacio adicional después de la tabla
+              y += 8
             }
           } catch (error) {
             console.error('Error agregando gráfica al PDF:', error)
-            doc.setFontSize(10)
+            doc.setFontSize(8)
             doc.setTextColor(244, 67, 54)
             doc.text('Error al generar la grafica', 20, y)
-            y += 10
+            y += 8
           }
         }
         
-        // ============ PIE DE PÁGINA (igual que dietas) ============
+        // ============ SECCIÓN DE FIRMA (en la última página) ============
         const totalPages = doc.internal.getNumberOfPages()
+        doc.setPage(totalPages)
+        
+        // Verificar si hay espacio suficiente, sino agregar nueva página
+        const yFirma = y > 235 ? (doc.addPage(), 52) : y + 15
+        y = yFirma
+        
+        // Línea de firma
+        doc.setDrawColor(100, 100, 100)
+        doc.setLineWidth(0.3)
+        doc.line(65, y, 145, y)
+        
+        y += 5
+        
+        // Nombre del nutriólogo
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(60, 60, 60)
+        const nombreNutriologo = nutricionistaInfo 
+          ? `${nutricionistaInfo.firstName} ${nutricionistaInfo.lastName}`
+          : 'Nutriólogo(a)'
+        doc.text(nombreNutriologo, 105, y, { align: 'center' })
+        
+        y += 4
+        
+        // Título profesional (igual que en el encabezado)
+        doc.setFontSize(7.5)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(100, 100, 100)
+        const tituloProfesional = nutricionistaInfo?.degree || 'Lic. en Nutrición'
+        doc.text(tituloProfesional, 105, y, { align: 'center' })
+        
+        if (nutricionistaInfo?.professionalLicense) {
+          y += 3.5
+          doc.text(`Ced. Prof. ${nutricionistaInfo.professionalLicense}`, 105, y, { align: 'center' })
+        }
+        
+        // ============ PIE DE PÁGINA ============
+        const totalPagesActualizado = doc.internal.getNumberOfPages()
         const colorVerde = [139, 195, 74]
         const colorGris = [120, 120, 120]
         const colorAzul = [95, 195, 228]
         
-        for (let i = 1; i <= totalPages; i++) {
+        for (let i = 1; i <= totalPagesActualizado; i++) {
           doc.setPage(i)
           
           // Línea decorativa superior del pie
-          doc.setDrawColor(200, 200, 200)
-          doc.setLineWidth(0.5)
+          doc.setDrawColor(220, 220, 220)
+          doc.setLineWidth(0.3)
           doc.line(20, 275, 190, 275)
           
-          // Número de página
-          doc.setFontSize(8)
+          // Columna izquierda - Número de página
+          doc.setFontSize(7)
           doc.setTextColor(...colorGris)
           doc.setFont('helvetica', 'normal')
-          doc.text(
-            `Pagina ${i} de ${totalPages}`,
-            105,
-            281,
-            { align: 'center' }
-          )
+          doc.text(`Pag. ${i} de ${totalPagesActualizado}`, 20, 282)
           
-          // Nombre del sistema
+          // Columna centro - Nombre del sistema
           doc.setFont('helvetica', 'bold')
+          doc.setFontSize(8)
           doc.setTextColor(...colorVerde)
-          doc.text(
-            'NUTRITRACK',
-            105,
-            286,
-            { align: 'center' }
-          )
+          doc.text('NUTRITRACK', 105, 281, { align: 'center' })
           
           // Subtítulo
           doc.setFont('helvetica', 'normal')
-          doc.setFontSize(7)
+          doc.setFontSize(6.5)
           doc.setTextColor(...colorGris)
-          doc.text(
-            'Sistema de Gestion Nutricional',
-            105,
-            290,
-            { align: 'center' }
-          )
+          doc.text('Sistema de Gestión Nutricional', 105, 285, { align: 'center' })
           
-          // Página web (esquina inferior derecha)
-          doc.setFontSize(7)
+          // Columna derecha - Contacto
+          doc.setFontSize(6.5)
           doc.setTextColor(...colorAzul)
-          doc.text('www.nutritrack.com', 190, 290, { align: 'right' })
+          doc.text('www.nutritrack.com', 190, 281, { align: 'right' })
+          doc.setTextColor(...colorGris)
+          doc.text('contacto@nutritrack.com', 190, 285, { align: 'right' })
           
           // Texto confidencial (centrado debajo de todo)
           doc.setFontSize(6)
           doc.setFont('helvetica', 'italic')
           doc.setTextColor(120, 120, 120)
-          doc.text('Documento confidencial - Uso exclusivo del personal médico autorizado', 105, 294, { align: 'center' })
+          doc.text('Documento confidencial - Uso exclusivo del personal médico autorizado', 105, 291, { align: 'center' })
         }
         
         // Guardar el PDF
@@ -1210,3 +1318,651 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* Container principal con gradiente de fondo */
+.patient-detail-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 50%, #e0f7fa 100%);
+  padding: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.patient-detail-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(139, 195, 74, 0.1) 0%, transparent 70%);
+  z-index: 1;
+}
+
+.patient-detail-container::after {
+  content: '';
+  position: absolute;
+  bottom: -50%;
+  left: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(95, 194, 198, 0.1) 0%, transparent 70%);
+  z-index: 1;
+}
+
+/* Header principal */
+.detail-header {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  border-radius: 20px;
+  padding: 30px 40px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 20px rgba(139, 195, 74, 0.3);
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.detail-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-icon {
+  font-size: 50px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.header-text {
+  flex: 1;
+}
+
+.header-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header-subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 5px 0 0 0;
+}
+
+/* Contenido principal */
+.detail-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Cards modernos */
+.modern-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid #8bc34a;
+  transition: all 0.3s ease;
+}
+
+.modern-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.info-card {
+  border-left-color: #8bc34a;
+}
+
+.weight-card {
+  border-left-color: #5fc2c6;
+}
+
+/* Header del paciente con avatar */
+.patient-name-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.patient-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8bc34a, #5fc2c6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 195, 74, 0.3);
+  flex-shrink: 0;
+}
+
+.patient-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.patient-id {
+  font-size: 14px;
+  color: #7a7a5a;
+  font-weight: 400;
+  display: block;
+  margin-top: 5px;
+}
+
+/* Grid de información */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.info-section {
+  margin-bottom: 20px;
+}
+
+/* Headers de sección con variantes de color */
+.section-header {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #8bc34a, #7ab73f);
+  color: white;
+  box-shadow: 0 3px 10px rgba(139, 195, 74, 0.3);
+}
+
+.section-header.header-green {
+  background: linear-gradient(135deg, #8bc34a, #7ab73f);
+  box-shadow: 0 3px 10px rgba(139, 195, 74, 0.3);
+}
+
+.section-header.header-blue {
+  background: linear-gradient(135deg, #5fc2c6, #4fb1b6);
+  box-shadow: 0 3px 10px rgba(95, 194, 198, 0.3);
+}
+
+.section-header.header-orange {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+}
+
+.section-header.header-red {
+  background: linear-gradient(135deg, #ff5252, #ff1744);
+  box-shadow: 0 3px 10px rgba(255, 82, 82, 0.3);
+}
+
+.section-icon {
+  font-size: 24px;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.2));
+}
+
+/* Filas de detalles */
+.detail-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+
+.detail-row:hover {
+  background: #e8f5e9;
+  transform: translateX(5px);
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #7a7a5a;
+  min-width: 150px;
+  font-size: 14px;
+}
+
+.detail-value {
+  color: #2c3e50;
+  font-size: 15px;
+  flex: 1;
+}
+
+/* Sección de emergencia */
+.emergency-section {
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 3px dashed #ff5252;
+}
+
+/* Card header con botón */
+.card-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title-icon {
+  font-size: 28px;
+}
+
+/* Botones de acción */
+.btn-action {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-action:active {
+  transform: translateY(0);
+}
+
+.btn-add-weight {
+  background: linear-gradient(135deg, #5fc2c6, #4fb1b6);
+}
+
+.btn-add-weight:hover {
+  background: linear-gradient(135deg, #4fb1b6, #3fa1a6);
+}
+
+/* Formularios */
+.form-section {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+
+.form-section h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #7a7a5a;
+  font-size: 14px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  padding: 10px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #8bc34a;
+  box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.1);
+}
+
+.form-textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Botones de formulario */
+.form-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #8bc34a, #7ab73f);
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(139, 195, 74, 0.3);
+}
+
+.btn-submit:hover {
+  background: linear-gradient(135deg, #7ab73f, #6aa72f);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(139, 195, 74, 0.4);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-cancel {
+  background: linear-gradient(135deg, #7a7a5a, #6a6a4a);
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(122, 122, 90, 0.3);
+}
+
+.btn-cancel:hover {
+  background: linear-gradient(135deg, #6a6a4a, #5a5a3a);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(122, 122, 90, 0.4);
+}
+
+/* Registros de peso */
+.weight-records {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.weight-record-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+  padding: 20px;
+  border-radius: 15px;
+  border-left: 4px solid #5fc2c6;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.weight-record-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+.weight-date {
+  font-size: 13px;
+  color: #7a7a5a;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.weight-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.weight-unit {
+  font-size: 16px;
+  color: #7a7a5a;
+  font-weight: 400;
+}
+
+.weight-diff {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.weight-diff.positive {
+  background: rgba(255, 82, 82, 0.1);
+  color: #ff5252;
+}
+
+.weight-diff.negative {
+  background: rgba(139, 195, 74, 0.1);
+  color: #8bc34a;
+}
+
+.weight-notes {
+  font-size: 13px;
+  color: #5a5a5a;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.record-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-record {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  flex: 1;
+}
+
+.btn-edit-record {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+}
+
+.btn-edit-record:hover {
+  background: linear-gradient(135deg, #f57c00, #e65100);
+  transform: scale(1.05);
+}
+
+.btn-delete-record {
+  background: linear-gradient(135deg, #ff5252, #ff1744);
+}
+
+.btn-delete-record:hover {
+  background: linear-gradient(135deg, #ff1744, #d50000);
+  transform: scale(1.05);
+}
+
+/* Mensajes de estado */
+.success-message,
+.error-message {
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.success-message {
+  background: rgba(139, 195, 74, 0.1);
+  color: #8bc34a;
+  border: 2px solid #8bc34a;
+}
+
+.error-message {
+  background: rgba(255, 82, 82, 0.1);
+  color: #ff5252;
+  border: 2px solid #ff5252;
+}
+
+/* Botón de volver */
+.back-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 2px solid rgba(139, 195, 74, 0.2);
+}
+
+.btn-back {
+  background: linear-gradient(135deg, #7a7a5a, #6a6a4a);
+  color: white;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 15px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(122, 122, 90, 0.3);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-back:hover {
+  background: linear-gradient(135deg, #6a6a4a, #5a5a3a);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(122, 122, 90, 0.4);
+}
+
+.btn-back:active {
+  transform: translateY(-1px) scale(1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .patient-detail-container {
+    padding: 15px;
+  }
+
+  .detail-header {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .header-title {
+    font-size: 24px;
+  }
+
+  .modern-card {
+    padding: 20px;
+  }
+
+  .patient-name-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .patient-title {
+    font-size: 22px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .weight-records {
+    grid-template-columns: 1fr;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+  }
+
+  .btn-back {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>

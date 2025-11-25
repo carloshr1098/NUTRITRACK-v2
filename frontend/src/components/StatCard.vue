@@ -103,47 +103,74 @@ export default {
 <style scoped>
 .stat-card {
   transition: all 0.3s ease;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   position: relative;
+  border-top: 4px solid #8bc34a;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%);
 }
 
 .stat-card-hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(139, 195, 74, 0.2) !important;
 }
 
 .stat-icon {
-  opacity: 0.9;
-  transition: transform 0.3s ease;
+  opacity: 0.85;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .stat-card:hover .stat-icon {
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(5deg);
+  opacity: 1;
 }
 
 .stat-value {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 2.25rem;
+  font-weight: 800;
   line-height: 1.2;
-  color: #2c3e50;
+  background: linear-gradient(135deg, #8bc34a 0%, #5fc2c6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 4px;
 }
 
 .stat-label {
   font-size: 0.875rem;
-  color: #7f8c8d;
-  font-weight: 500;
+  color: #2c3e50;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .stat-subtitle {
   font-size: 0.8rem;
-  color: #95a5a6;
+  color: #7f8c8d;
+  font-weight: 500;
 }
 
 .trend-chip {
   font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Colores personalizados según la paleta NutriTrack */
+:deep(.v-icon.text-primary),
+:deep(.v-progress-linear.bg-primary) {
+  color: #8bc34a !important;
+}
+
+:deep(.v-icon.text-success) {
+  color: #5fc2c6 !important;
+}
+
+:deep(.v-icon.text-orange) {
+  color: #ff5252 !important;
+}
+
+:deep(.v-icon.text-purple) {
+  color: #7a7a5a !important;
 }
 </style>

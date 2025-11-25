@@ -1,19 +1,22 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col cols="12">
-        <h2 class="text-h4 mb-4">
-          <v-icon class="mr-2">mdi-food-apple</v-icon>
-          Gestión de Planes Dietéticos
-        </h2>
-      </v-col>
-    </v-row>
+  <div class="diet-plans-container">
+    <!-- Header elegante -->
+    <div class="diet-plans-header">
+      <div class="header-content">
+        <div class="header-icon">🍎</div>
+        <div class="header-text">
+          <h1 class="header-title">Gestión de Planes Dietéticos</h1>
+          <p class="header-subtitle">Crea y administra planes nutricionales personalizados</p>
+        </div>
+      </div>
+    </div>
 
+    <v-container class="diet-plans-content">
     <!-- Formulario para nuevo plan -->
     <v-row>
       <v-col cols="12" md="6">
-        <v-card elevation="2">
-          <v-card-title class="bg-green text-white">
+        <v-card elevation="2" class="modern-card form-card">
+          <v-card-title class="card-header-green">
             <v-icon class="mr-2">mdi-plus</v-icon>
             Nuevo Plan Dietético
           </v-card-title>
@@ -100,8 +103,8 @@
 
       <!-- Planes activos -->
       <v-col cols="12" md="6">
-        <v-card elevation="2">
-          <v-card-title class="bg-blue text-white">
+        <v-card elevation="2" class="modern-card active-card">
+          <v-card-title class="card-header-blue">
             <v-icon class="mr-2">mdi-clipboard-check</v-icon>
             Planes Activos ({{ planesActivos.length }})
           </v-card-title>
@@ -147,8 +150,8 @@
     <!-- Tabla de todos los planes -->
     <v-row class="mt-4">
       <v-col cols="12">
-        <v-card elevation="2">
-          <v-card-title class="bg-primary text-white">
+        <v-card elevation="2" class="modern-card table-card">
+          <v-card-title class="card-header-orange">
             <v-icon class="mr-2">mdi-view-list</v-icon>
             Todos los Planes Dietéticos
           </v-card-title>
@@ -417,6 +420,15 @@
       {{ notificacion.mensaje }}
     </v-snackbar>
   </v-container>
+
+  <!-- Botón de volver -->
+  <div class="back-button-container">
+    <router-link to="/nutritionist/dashboard" class="btn-back">
+      <span class="btn-icon">←</span>
+      Volver al Dashboard
+    </router-link>
+  </div>
+  </div>
 </template>
 
 <script>
@@ -921,7 +933,314 @@ export default {
 </script>
 
 <style scoped>
+/* Container principal */
+.diet-plans-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafb 0%, #e8f4f8 100%);
+  position: relative;
+  padding-bottom: 60px;
+}
+
+.diet-plans-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(95, 194, 198, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.diet-plans-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 30px;
+}
+
+/* Header elegante */
+.diet-plans-header {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  padding: 40px 30px;
+  box-shadow: 0 8px 32px rgba(139, 195, 74, 0.3);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.diet-plans-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.header-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.header-text {
+  flex: 1;
+}
+
+.header-title {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header-subtitle {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Cards modernas */
+.modern-card {
+  border-radius: 20px !important;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-left: 5px solid #8bc34a;
+}
+
+.modern-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(139, 195, 74, 0.2) !important;
+}
+
+.form-card {
+  border-left-color: #8bc34a;
+}
+
+.active-card {
+  border-left-color: #5fc2c6;
+}
+
+.table-card {
+  border-left-color: #ff9800;
+}
+
+/* Headers de cards */
+.card-header-green {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%) !important;
+  color: white !important;
+  padding: 20px 24px !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+}
+
+.card-header-blue {
+  background: linear-gradient(135deg, #5fc2c6 0%, #4fb3b7 100%) !important;
+  color: white !important;
+  padding: 20px 24px !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+}
+
+.card-header-orange {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+  color: white !important;
+  padding: 20px 24px !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+}
+
+/* Botones mejorados */
+:deep(.v-btn) {
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+}
+
+:deep(.v-btn[color="green"]) {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%) !important;
+}
+
+:deep(.v-btn[color="green"]:hover) {
+  background: linear-gradient(135deg, #7ab73f 0%, #689f38 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 195, 74, 0.4) !important;
+}
+
+:deep(.v-btn[color="info"]) {
+  background: linear-gradient(135deg, #5fc2c6 0%, #4fb3b7 100%) !important;
+}
+
+:deep(.v-btn[color="info"]:hover) {
+  transform: scale(1.05);
+}
+
+:deep(.v-btn[color="primary"]) {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%) !important;
+}
+
+:deep(.v-btn[color="warning"]) {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+}
+
+:deep(.v-btn[color="error"]) {
+  background: linear-gradient(135deg, #ff5252 0%, #f44336 100%) !important;
+}
+
+:deep(.v-btn[color="success"]) {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%) !important;
+}
+
+/* Campos de formulario */
+:deep(.v-input) {
+  margin-bottom: 8px;
+}
+
+:deep(.v-field) {
+  border-radius: 12px !important;
+}
+
+:deep(.v-field:hover) {
+  background: rgba(139, 195, 74, 0.05);
+}
+
+/* Chips */
+:deep(.v-chip) {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+/* Lista items */
+:deep(.v-list-item) {
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+:deep(.v-list-item:hover) {
+  background: linear-gradient(90deg, rgba(139, 195, 74, 0.08) 0%, transparent 100%) !important;
+  border-left-color: #8bc34a;
+  transform: translateX(5px);
+}
+
+/* Avatars */
+:deep(.v-avatar) {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Data table */
+:deep(.v-table) {
+  border-radius: 16px !important;
+}
+
+:deep(.v-table th) {
+  background: #f8fafb !important;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+}
+
+:deep(.v-table tr:hover) {
+  background: linear-gradient(90deg, rgba(139, 195, 74, 0.05) 0%, transparent 100%) !important;
+}
+
+/* Diálogos mejorados */
+:deep(.v-dialog .v-card) {
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+
+:deep(.v-dialog .v-card-title) {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 20px 24px;
+}
+
+/* Botón de volver */
+.back-button-container {
+  max-width: 1400px;
+  margin: 40px auto 0;
+  padding: 0 30px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #7a7a5a 0%, #6a6a4a 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(122, 122, 90, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-back:hover {
+  background: linear-gradient(135deg, #6a6a4a 0%, #5a5a3a 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(122, 122, 90, 0.4);
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
 .border {
   border: 1px solid #e0e0e0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .diet-plans-header {
+    padding: 30px 20px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header-title {
+    font-size: 2rem;
+  }
+  
+  .header-icon {
+    font-size: 3rem;
+  }
 }
 </style>

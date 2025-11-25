@@ -5,8 +5,11 @@
       <v-col cols="12">
         <div class="welcome-section">
           <h1 class="text-h3 font-weight-bold mb-2">
-            ¡Bienvenido de nuevo, {{ userName }}! 👋
+            Bienvenido, {{ userFullName }} 👋
           </h1>
+          <p class="text-subtitle-1 user-role">
+            ROL: {{ userRole }}
+          </p>
           <p class="text-subtitle-1 text-grey">
             {{ currentDate }} • Panel de Control Nutricional
           </p>
@@ -259,6 +262,8 @@ export default {
   data() {
     return {
       userName: 'Nutricionista',
+      userFullName: 'Nutricionista',
+      userRole: 'NUTRIÓLOGO',
       pesoTimeRange: 'month',
       stats: {
         totalPacientes: 0,
@@ -332,7 +337,11 @@ export default {
     }
   },
   async mounted() {
+    this.obtenerNombreUsuario()
     await this.cargarDatos()
+  },
+  activated() {
+    // Se ejecuta cada vez que la vista se activa (útil con keep-alive)
     this.obtenerNombreUsuario()
   },
   methods: {
@@ -524,8 +533,46 @@ export default {
     },
     
     obtenerNombreUsuario() {
-      const user = JSON.parse(localStorage.getItem('user') || '{}')
-      this.userName = user.username || 'Nutricionista'
+      try {
+        const userString = localStorage.getItem('user')
+        console.log('📝 Raw user string:', userString)
+        
+        if (!userString || userString === 'null' || userString === 'undefined') {
+          console.warn('⚠️ No hay usuario en localStorage')
+          return
+        }
+        
+        const user = JSON.parse(userString)
+        console.log('👤 Usuario parseado:', user)
+        console.log('📋 firstName:', user.firstName)
+        console.log('📋 lastName:', user.lastName)
+        
+        this.userName = user.username || 'Nutricionista'
+        
+        // Obtener nombre completo
+        const firstName = user.firstName || ''
+        const lastName = user.lastName || ''
+        const fullName = `${firstName} ${lastName}`.trim()
+        
+        console.log('✅ Nombre completo construido:', fullName)
+        
+        this.userFullName = fullName || user.username || 'Nutricionista'
+        
+        console.log('✅ userFullName final:', this.userFullName)
+        
+        // Formatear el rol - puede venir en roles[] o role
+        let role = 'NUTRIÓLOGO'
+        if (user.roles && user.roles.length > 0) {
+          role = user.roles[0].replace('ROLE_', '').replace('_', ' ')
+        } else if (user.role) {
+          role = user.role.replace('ROLE_', '').replace('_', ' ')
+        }
+        this.userRole = role
+        
+        console.log('✅ userRole final:', this.userRole)
+      } catch (error) {
+        console.error('❌ Error al obtener nombre de usuario:', error)
+      }
     },
     
     navegarA(ruta) {
@@ -537,49 +584,161 @@ export default {
 
 <style scoped>
 .dashboard-container {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #f8fafb 0%, #e8f4f8 100%);
   min-height: 100vh;
   padding: 24px;
+  position: relative;
+}
+
+.dashboard-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(95, 194, 198, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dashboard-container > * {
+  position: relative;
+  z-index: 1;
 }
 
 .welcome-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 32px;
-  border-radius: 16px;
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  padding: 40px;
+  border-radius: 20px;
   color: white;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 12px 35px rgba(139, 195, 74, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  filter: blur(60px);
+}
+
+.welcome-section h1 {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-role {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 600;
+  font-size: 16px !important;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .chart-card {
-  border-radius: 12px;
+  border-radius: 16px;
   height: 100%;
+  border-left: 4px solid #8bc34a;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.chart-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(139, 195, 74, 0.15);
+  border-left-width: 6px;
 }
 
 .activity-card {
-  border-radius: 12px;
+  border-radius: 16px;
   height: 100%;
+  overflow: hidden;
+  border-left: 4px solid #5fc2c6;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.activity-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(95, 194, 198, 0.15);
+  border-left-width: 6px;
 }
 
 .appointment-item {
   transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  padding: 12px 16px;
 }
 
 .appointment-item:hover {
-  background-color: rgba(0,0,0,0.02);
+  background: linear-gradient(90deg, rgba(139, 195, 74, 0.08) 0%, transparent 100%);
+  border-left-color: #8bc34a;
+  padding-left: 20px;
 }
 
 .quick-actions-card {
-  border-radius: 12px;
+  border-radius: 16px;
+  border-top: 4px solid #8bc34a;
+  background: white;
 }
 
 .quick-action-btn {
   cursor: pointer;
   transition: all 0.3s ease;
-  border-radius: 12px;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%);
 }
 
 .quick-action-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 16px 32px rgba(139, 195, 74, 0.25);
+  border-color: #8bc34a;
+  background: white;
+}
+
+/* Colores personalizados de la paleta NutriTrack */
+:deep(.v-card-title.bg-primary) {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%) !important;
+  box-shadow: 0 2px 8px rgba(139, 195, 74, 0.2);
+}
+
+:deep(.v-card-title.bg-success) {
+  background: linear-gradient(135deg, #5fc2c6 0%, #4fb3b7 100%) !important;
+  box-shadow: 0 2px 8px rgba(95, 194, 198, 0.2);
+}
+
+:deep(.text-primary) {
+  color: #8bc34a !important;
+}
+
+:deep(.text-success) {
+  color: #5fc2c6 !important;
+}
+
+:deep(.v-btn.text-primary) {
+  color: #8bc34a !important;
+}
+
+:deep(.v-btn.text-primary:hover) {
+  background: rgba(139, 195, 74, 0.08) !important;
+}
+
+:deep(.v-avatar) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+:deep(.v-timeline-item) {
+  padding-bottom: 16px;
 }
 </style>

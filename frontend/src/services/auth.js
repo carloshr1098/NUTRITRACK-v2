@@ -29,12 +29,19 @@ const authService = {
       const response = await api.post('/auth/signin', credentials)
       console.log('📦 Respuesta del servidor:', response.data)
       
-      // El backend devuelve 'accessToken' no 'token'
+      // El backend devuelve 'accessToken' y todos los datos del usuario
       const { accessToken, type, ...userData } = response.data
-      console.log('🔑 Token extraído:', accessToken ? 'SÍ' : 'NO')
-      console.log('👤 userData:', userData)
       
-      this.setAuthData(accessToken, userData)
+      // Incluir todos los datos del usuario
+      const fullUserData = {
+        ...userData,
+        role: userData.roles && userData.roles.length > 0 ? userData.roles[0] : 'ROLE_NUTRIOLOGO'
+      }
+      
+      console.log('🔑 Token extraído:', accessToken ? 'SÍ' : 'NO')
+      console.log('👤 userData completo:', fullUserData)
+      
+      this.setAuthData(accessToken, fullUserData)
       console.log('✅ Login completado')
       return response.data
     } catch (error) {
