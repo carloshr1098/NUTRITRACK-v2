@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,9 +45,9 @@ public class DataInitController {
             }
 
             // Create Roles
-            Role adminRole = new Role("ROLE_ADMIN");
-            Role nutriologoRole = new Role("ROLE_NUTRIOLOGO");
-            Role pacienteRole = new Role("ROLE_PACIENTE");
+            Role adminRole = new Role(ERole.ROLE_ADMIN);
+            Role nutriologoRole = new Role(ERole.ROLE_NUTRIOLOGO);
+            Role pacienteRole = new Role(ERole.ROLE_PACIENTE);
             
             roleRepository.save(adminRole);
             roleRepository.save(nutriologoRole);
@@ -92,8 +93,8 @@ public class DataInitController {
             patient.setLastName("Pérez");
             patient.setDateOfBirth(LocalDate.of(1990, 5, 15));
             patient.setGender("Masculino");
-            patient.setHeight(175.00);
-            patient.setCurrentWeight(80.00);
+            patient.setHeight(new BigDecimal("175.00"));
+            patient.setCurrentWeight(new BigDecimal("80.00"));
             patient.setActivityLevel("Moderado");
             patient.setEmail("paciente@nutritrack.com");
             patient.setPhone("5598765432");
