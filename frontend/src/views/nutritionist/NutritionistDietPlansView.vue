@@ -15,7 +15,7 @@
     <!-- Formulario para nuevo plan -->
     <v-row>
       <v-col cols="12" md="6">
-        <v-card elevation="2" class="modern-card form-card">
+        <v-card elevation="3" class="modern-card form-card">
           <v-card-title class="card-header-green">
             <v-icon class="mr-2">mdi-plus</v-icon>
             Nuevo Plan Dietético
@@ -108,40 +108,42 @@
             <v-icon class="mr-2">mdi-clipboard-check</v-icon>
             Planes Activos ({{ planesActivos.length }})
           </v-card-title>
-          <v-card-text>
+          <v-card-text class="pa-0">
             <div v-if="cargandoPlanes" class="text-center pa-4">
               <v-progress-circular indeterminate color="blue"></v-progress-circular>
             </div>
             <div v-else-if="planesActivos.length === 0" class="text-center pa-4 text-grey">
               No hay planes activos
             </div>
-            <v-list v-else>
-              <v-list-item
-                v-for="plan in planesActivos"
-                :key="plan.id"
-                class="mb-2 border rounded"
-              >
-                <template v-slot:prepend>
-                  <v-avatar color="green" size="40">
-                    <v-icon color="white">mdi-food-apple</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title class="font-weight-bold">
-                  {{ plan.planName }}
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ plan.patient?.firstName }} {{ plan.patient?.lastName }}
-                </v-list-item-subtitle>
-                <v-list-item-subtitle>
-                  <v-icon size="small">mdi-calendar</v-icon>
-                  {{ formatearFecha(plan.startDate) }} - {{ formatearFecha(plan.endDate) }}
-                </v-list-item-subtitle>
-                <v-list-item-subtitle>
-                  <v-icon size="small">mdi-fire</v-icon>
-                  {{ plan.dailyCalories }} kcal/día
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
+            <div v-else class="planes-activos-scroll">
+              <v-list class="pa-2">
+                <v-list-item
+                  v-for="plan in planesActivos"
+                  :key="plan.id"
+                  class="mb-2 border rounded plan-item-fixed"
+                >
+                  <template v-slot:prepend>
+                    <v-avatar color="green" size="40">
+                      <v-icon color="white">mdi-food-apple</v-icon>
+                    </v-avatar>
+                  </template>
+                  <v-list-item-title class="font-weight-bold text-truncate">
+                    {{ plan.planName }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle class="text-truncate">
+                    {{ plan.patient?.firstName }} {{ plan.patient?.lastName }}
+                  </v-list-item-subtitle>
+                  <v-list-item-subtitle class="text-caption">
+                    <v-icon size="x-small">mdi-calendar</v-icon>
+                    {{ formatearFecha(plan.startDate) }} - {{ formatearFecha(plan.endDate) }}
+                  </v-list-item-subtitle>
+                  <v-list-item-subtitle class="text-caption">
+                    <v-icon size="x-small">mdi-fire</v-icon>
+                    {{ plan.dailyCalories }} kcal/día
+                  </v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -150,12 +152,23 @@
     <!-- Tabla de todos los planes -->
     <v-row class="mt-4">
       <v-col cols="12">
-        <v-card elevation="2" class="modern-card table-card">
-          <v-card-title class="card-header-orange">
-            <v-icon class="mr-2">mdi-view-list</v-icon>
-            Todos los Planes Dietéticos
+        <v-card elevation="3" class="modern-card list-card">
+          <v-card-title class="card-header-orange d-flex justify-space-between align-center">
+            <span>
+              <v-icon class="mr-2">mdi-view-list</v-icon>
+              Todos los Planes Dietéticos
+            </span>
+            <v-btn 
+              color="white" 
+              variant="outlined" 
+              @click="cargarPlanes"
+              size="small"
+            >
+              <v-icon class="mr-1">mdi-refresh</v-icon>
+              Actualizar
+            </v-btn>
           </v-card-title>
-          <v-card-text>
+          <v-card-text class="pa-0">
             <v-data-table
               :headers="encabezados"
               :items="todosLosPlanes"
@@ -163,7 +176,7 @@
               loading-text="Cargando planes..."
               no-data-text="No hay planes registrados"
               items-per-page="10"
-              class="elevation-1"
+              class="elevation-0"
             >
               <template v-slot:item.patient="{ item }">
                 <div class="d-flex align-center">
@@ -521,7 +534,7 @@ export default {
       try {
         this.cargandoPlanes = true
         const response = await api.get('/diet-plans')
-        this.planesActivos = response.data.filter(p => p.status === 'ACTIVE')
+        this.planesActivos = response.data.filter(p => p.status === 'ACTIVO')
       } catch (error) {
         console.error('Error al cargar planes activos:', error)
       } finally {
@@ -1046,6 +1059,45 @@ export default {
 
 .table-card {
   border-left-color: #ff9800;
+}
+
+/* Contenedor con scroll para planes activos */
+.planes-activos-scroll {
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Scrollbar personalizado */
+.planes-activos-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.planes-activos-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.planes-activos-scroll::-webkit-scrollbar-thumb {
+  background: #5fc2c6;
+  border-radius: 10px;
+}
+
+.planes-activos-scroll::-webkit-scrollbar-thumb:hover {
+  background: #4db1b5;
+}
+
+/* Tarjeta de plan con altura fija */
+.plan-item-fixed {
+  min-height: 120px;
+  max-height: 120px;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.plan-item-fixed:hover {
+  background: #f5f5f5;
+  transform: translateX(4px);
 }
 
 /* Headers de cards */

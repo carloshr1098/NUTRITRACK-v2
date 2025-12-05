@@ -130,8 +130,23 @@
     </div>
 
     <!-- Tabla de alimentos -->
-    <v-card>
-      <v-card-text>
+    <v-card elevation="3" class="modern-card list-card">
+      <v-card-title class="card-header-orange d-flex justify-space-between align-center">
+        <span>
+          <v-icon class="mr-2">mdi-food</v-icon>
+          Todos los Alimentos
+        </span>
+        <v-btn 
+          color="white" 
+          variant="outlined" 
+          @click="cargarAlimentos"
+          size="small"
+        >
+          <v-icon class="mr-1">mdi-refresh</v-icon>
+          Actualizar
+        </v-btn>
+      </v-card-title>
+      <v-card-text class="pa-0">
         <v-data-table
           :headers="headers"
           :items="alimentosFiltrados"

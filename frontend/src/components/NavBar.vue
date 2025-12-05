@@ -194,8 +194,13 @@ export default {
     }
     
     const goToSettings = () => {
-      // TODO: Implementar vista de configuración
-      console.log('Ir a configuración')
+      const roles = user.value?.roles || []
+      if (roles.includes('ROLE_ADMIN') || roles.includes('ROLE_NUTRIOLOGO')) {
+        router.push('/nutriologo/configuracion')
+      } else if (roles.includes('ROLE_PACIENTE')) {
+        // TODO: Crear vista de configuración para pacientes
+        router.push('/paciente/perfil')
+      }
     }
     
     const logout = async () => {

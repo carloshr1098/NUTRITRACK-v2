@@ -66,19 +66,23 @@
 
       <!-- Tabs por tipo de comida -->
       <v-tabs v-model="tabActual" color="green">
-        <v-tab value="BREAKFAST">
+        <v-tab value="DESAYUNO">
           <v-icon class="mr-2">mdi-weather-sunny</v-icon>
           Desayuno
         </v-tab>
-        <v-tab value="SNACK">
+        <v-tab value="COLACION_AM">
           <v-icon class="mr-2">mdi-food-apple</v-icon>
           Snack
         </v-tab>
-        <v-tab value="LUNCH">
+        <v-tab value="ALMUERZO">
           <v-icon class="mr-2">mdi-silverware-fork-knife</v-icon>
           Comida
         </v-tab>
-        <v-tab value="DINNER">
+        <v-tab value="COLACION_PM">
+          <v-icon class="mr-2">mdi-food-apple</v-icon>
+          Snack
+        </v-tab>
+        <v-tab value="CENA">
           <v-icon class="mr-2">mdi-moon-waning-crescent</v-icon>
           Cena
         </v-tab>
@@ -86,7 +90,7 @@
 
       <v-window v-model="tabActual" class="mt-4">
         <v-window-item
-          v-for="tipo in ['BREAKFAST', 'SNACK', 'LUNCH', 'DINNER']"
+          v-for="tipo in ['DESAYUNO', 'COLACION_AM', 'ALMUERZO', 'COLACION_PM', 'CENA']"
           :key="tipo"
           :value="tipo"
         >
@@ -432,7 +436,7 @@ export default {
   },
   data() {
     return {
-      tabActual: 'BREAKFAST',
+      tabActual: 'DESAYUNO',
       comidas: [],
       resumen: null,
       dialogoNuevaComida: false,
@@ -470,10 +474,11 @@ export default {
         notes: ''
       },
       tiposComida: [
-        { title: 'Desayuno', value: 'BREAKFAST' },
-        { title: 'Snack', value: 'SNACK' },
-        { title: 'Comida', value: 'LUNCH' },
-        { title: 'Cena', value: 'DINNER' }
+        { title: 'Desayuno', value: 'DESAYUNO' },
+        { title: 'Colación AM', value: 'COLACION_AM' },
+        { title: 'Almuerzo', value: 'ALMUERZO' },
+        { title: 'Colación PM', value: 'COLACION_PM' },
+        { title: 'Cena', value: 'CENA' }
       ],
       notificacion: {
         mostrar: false,
@@ -585,10 +590,11 @@ export default {
 
     nombreTipo(tipo) {
       const nombres = {
-        'BREAKFAST': 'el desayuno',
-        'SNACK': 'los snacks',
-        'LUNCH': 'la comida',
-        'DINNER': 'la cena'
+        'DESAYUNO': 'el desayuno',
+        'COLACION_AM': 'la colación de la mañana',
+        'ALMUERZO': 'el almuerzo',
+        'COLACION_PM': 'la colación de la tarde',
+        'CENA': 'la cena'
       }
       return nombres[tipo] || tipo
     },

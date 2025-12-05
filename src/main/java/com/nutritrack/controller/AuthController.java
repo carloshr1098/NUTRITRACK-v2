@@ -3,6 +3,7 @@ package com.nutritrack.controller;
 import com.nutritrack.entity.ERole;
 import com.nutritrack.entity.Role;
 import com.nutritrack.entity.User;
+import com.nutritrack.payload.request.ChangePasswordRequest;
 import com.nutritrack.payload.request.LoginRequest;
 import com.nutritrack.payload.request.SignupRequest;
 import com.nutritrack.payload.request.UpdateProfileRequest;
@@ -217,6 +218,34 @@ public class AuthController {
         });
         
         return ResponseEntity.ok(new MessageResponse(sb.toString()));
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        try {
+            // Obtener el usuario autenticado
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            
+            // Buscar el usuario
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
+            // Verificar la contraseña actual
+            if (!encoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                return ResponseEntity.badRequest()
+                        .body(new MessageResponse("La contraseña actual es incorrecta"));
+            }
+            
+            // Actualizar la contraseña
+            user.setPassword(encoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+            
+            return ResponseEntity.ok(new MessageResponse("Contraseña actualizada correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error al cambiar la contraseña: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/init-data")

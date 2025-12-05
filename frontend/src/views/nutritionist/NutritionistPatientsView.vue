@@ -13,6 +13,23 @@
     
     <!-- Barra de acciones -->
     <div class="actions-bar">
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input 
+          v-model="busqueda"
+          type="text"
+          class="search-input"
+          placeholder="Buscar paciente por nombre, apellido o email..."
+        >
+        <button 
+          v-if="busqueda"
+          @click="busqueda = ''"
+          class="clear-search-btn"
+          title="Limpiar búsqueda"
+        >
+          ✖
+        </button>
+      </div>
       <div class="actions-buttons">
         <button 
           @click="mostrarFormulario = !mostrarFormulario" 
@@ -35,190 +52,257 @@
     <div v-if="mostrarFormulario" 
          class="modal-overlay"
          @click.self="cancelarFormulario">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div class="modal-title-section">
-            <span class="modal-icon">{{ modoEdicion ? '✏️' : '➕' }}</span>
-            <h3 class="modal-title">{{ modoEdicion ? 'Editar Paciente' : 'Nuevo Paciente' }}</h3>
+      <div class="modal-edit-content">
+        <div class="modal-edit-header">
+          <div class="modal-header-icon">{{ modoEdicion ? '✏️' : '➕' }}</div>
+          <div>
+            <h2 class="modal-edit-title">{{ modoEdicion ? 'Editar Información del Paciente' : 'Registrar Nuevo Paciente' }}</h2>
+            <p class="modal-edit-subtitle">{{ modoEdicion ? 'Actualiza los datos del paciente' : 'Completa la información del nuevo paciente' }}</p>
           </div>
           <button 
+            type="button"
             @click="cancelarFormulario"
-            class="btn-close-modal"
+            class="modal-close-btn"
             title="Cerrar"
           >
             ✖
           </button>
         </div>
         
-        <form @submit.prevent="modoEdicion ? actualizarPaciente() : crearPaciente()" class="modal-form">
-          <div class="form-grid">
-            <div class="form-group">
-              <label class="form-label">Nombre *</label>
-              <input 
-                v-model="nuevoPaciente.primerNombre" 
-                type="text" 
-                required
-                @blur="nuevoPaciente.primerNombre = capitalizarNombre(nuevoPaciente.primerNombre)"
-                class="form-input"
-              >
+        <form @submit.prevent="modoEdicion ? actualizarPaciente() : crearPaciente()" class="modal-edit-form">
+          <!-- Sección: Información Personal -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <span class="form-section-icon">📋</span>
+              <h3 class="form-section-title">Información Personal</h3>
             </div>
-            <div class="form-group">
-              <label class="form-label">Apellido *</label>
-              <input 
-                v-model="nuevoPaciente.primerApellido" 
-                type="text" 
-                required
-                @blur="nuevoPaciente.primerApellido = capitalizarNombre(nuevoPaciente.primerApellido)"
-                class="form-input"
-              >
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label">Nombre *</label>
+                <input 
+                  v-model="nuevoPaciente.primerNombre" 
+                  type="text" 
+                  required
+                  @blur="nuevoPaciente.primerNombre = capitalizarNombre(nuevoPaciente.primerNombre)"
+                  class="form-input"
+                  placeholder="Ingresa el nombre"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Apellido *</label>
+                <input 
+                  v-model="nuevoPaciente.primerApellido" 
+                  type="text" 
+                  required
+                  @blur="nuevoPaciente.primerApellido = capitalizarNombre(nuevoPaciente.primerApellido)"
+                  class="form-input"
+                  placeholder="Ingresa el apellido"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Fecha de Nacimiento *</label>
+                <input 
+                  v-model="nuevoPaciente.fechaNacimiento" 
+                  type="date" 
+                  required
+                  class="form-input"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Género *</label>
+                <select 
+                  v-model="nuevoPaciente.genero" 
+                  required
+                  class="form-input"
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                  <option value="O">Otro</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Email</label>
+                <input 
+                  v-model="nuevoPaciente.email" 
+                  type="email" 
+                  class="form-input"
+                  placeholder="correo@ejemplo.com"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Teléfono</label>
+                <input 
+                  v-model="nuevoPaciente.telefono" 
+                  type="tel" 
+                  maxlength="10"
+                  @keypress="soloNumerosEnteros"
+                  placeholder="10 dígitos"
+                  class="form-input"
+                >
+              </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Fecha de Nacimiento *</label>
-              <input 
-                v-model="nuevoPaciente.fechaNacimiento" 
-                type="date" 
-                required
-                class="form-input"
-              >
+          </div>
+
+          <!-- Sección: Medidas Físicas -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <span class="form-section-icon">📏</span>
+              <h3 class="form-section-title">Medidas Físicas</h3>
             </div>
-            <div class="form-group">
-              <label class="form-label">Género *</label>
-              <select 
-                v-model="nuevoPaciente.genero" 
-                required
-                class="form-select"
-              >
-                <option value="">Seleccionar...</option>
-                <option value="M">Masculino</option>
-                <option value="F">Femenino</option>
-                <option value="O">Otro</option>
-              </select>
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label">Altura (cm) *</label>
+                <input 
+                  v-model.number="nuevoPaciente.altura" 
+                  type="number" 
+                  step="0.01"
+                  min="0"
+                  required
+                  @keypress="soloNumeros"
+                  class="form-input"
+                  placeholder="175"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Peso Actual (kg) *</label>
+                <input 
+                  v-model.number="nuevoPaciente.pesoActual" 
+                  type="number" 
+                  step="0.01"
+                  min="0"
+                  required
+                  @keypress="soloNumeros"
+                  class="form-input"
+                  placeholder="70"
+                >
+              </div>
+              <div class="form-field" style="grid-column: 1 / -1;">
+                <label class="form-label">Nivel de Actividad</label>
+                <select 
+                  v-model="nuevoPaciente.nivelActividad" 
+                  class="form-input"
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="SEDENTARIO">Sedentario</option>
+                  <option value="LIGERO">Actividad Ligera</option>
+                  <option value="MODERADO">Actividad Moderada</option>
+                  <option value="ACTIVO">Activo</option>
+                  <option value="MUY_ACTIVO">Muy Activo</option>
+                </select>
+              </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Altura (cm) *</label>
-              <input 
-                v-model.number="nuevoPaciente.altura" 
-                type="number" 
-                step="0.01"
-                min="0"
-                required
-                @keypress="soloNumeros"
-                class="form-input"
-              >
+          </div>
+
+          <!-- Sección: Información Médica -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <span class="form-section-icon">🏥</span>
+              <h3 class="form-section-title">Información Médica</h3>
             </div>
-            <div class="form-group">
-              <label class="form-label">Peso Actual (kg) *</label>
-              <input 
-                v-model.number="nuevoPaciente.pesoActual" 
-                type="number" 
-                step="0.01"
-                min="0"
-                required
-                @keypress="soloNumeros"
-                class="form-input"
-              >
+            <div class="form-grid-full">
+              <div class="form-field">
+                <label class="form-label">Objetivos de Salud *</label>
+                <select 
+                  v-model="nuevoPaciente.healthGoal" 
+                  required
+                  class="form-input"
+                >
+                  <option value="">Seleccionar objetivo...</option>
+                  <option value="PERDER_PESO">Perder Peso</option>
+                  <option value="GANAR_MASA_MUSCULAR">Ganar Masa Muscular</option>
+                  <option value="MANTENER_PESO">Mantener Peso</option>
+                  <option value="MEJORAR_SALUD">Mejorar Salud General</option>
+                  <option value="CONTROL_DIABETES">Control de Diabetes</option>
+                  <option value="REDUCIR_COLESTEROL">Reducir Colesterol</option>
+                  <option value="DEPORTIVO">Rendimiento Deportivo</option>
+                  <option value="OTRO">Otro</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Condiciones Médicas</label>
+                <textarea 
+                  v-model="nuevoPaciente.condicionesMedicas" 
+                  rows="3"
+                  class="form-input"
+                  placeholder="Ej: Diabetes tipo 2, hipertensión..."
+                ></textarea>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Alergias</label>
+                <textarea 
+                  v-model="nuevoPaciente.alergias" 
+                  rows="2"
+                  class="form-input"
+                  placeholder="Ej: Nueces, mariscos, lactosa..."
+                ></textarea>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Restricciones Dietéticas</label>
+                <textarea 
+                  v-model="nuevoPaciente.restriccionesDieteticas" 
+                  rows="2"
+                  class="form-input"
+                  placeholder="Ej: Vegetariano, bajo en sodio..."
+                ></textarea>
+              </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Email</label>
-              <input 
-                v-model="nuevoPaciente.email" 
-                type="email" 
-                class="form-input"
-              >
+          </div>
+
+          <!-- Sección: Contacto de Emergencia -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <span class="form-section-icon">🚨</span>
+              <h3 class="form-section-title">Contacto de Emergencia</h3>
             </div>
-            <div class="form-group">
-              <label class="form-label">Teléfono</label>
-              <input 
-                v-model="nuevoPaciente.telefono" 
-                type="tel" 
-                maxlength="10"
-                @keypress="soloNumerosEnteros"
-                placeholder="10 dígitos"
-                class="form-input"
-              >
-            </div>
-            <div class="form-group form-group-full">
-              <label class="form-label">Nivel de Actividad</label>
-              <select 
-                v-model="nuevoPaciente.nivelActividad" 
-                class="form-select"
-              >
-                <option value="">Seleccionar...</option>
-                <option value="SEDENTARIO">Sedentario</option>
-                <option value="LIGERO">Actividad Ligera</option>
-                <option value="MODERADO">Actividad Moderada</option>
-                <option value="ACTIVO">Activo</option>
-                <option value="MUY_ACTIVO">Muy Activo</option>
-              </select>
-            </div>
-            <div class="form-group form-group-full">
-              <label class="form-label">Condiciones Médicas</label>
-              <textarea 
-                v-model="nuevoPaciente.condicionesMedicas" 
-                rows="3"
-                class="form-textarea"
-              ></textarea>
-            </div>
-            <div class="form-group form-group-full">
-              <label class="form-label">Alergias</label>
-              <textarea 
-                v-model="nuevoPaciente.alergias" 
-                rows="2"
-                class="form-textarea"
-              ></textarea>
-            </div>
-            <div class="form-group form-group-full">
-              <label class="form-label">Restricciones Dietéticas</label>
-              <textarea 
-                v-model="nuevoPaciente.restriccionesDieteticas" 
-                rows="2"
-                class="form-textarea"
-              ></textarea>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Contacto de Emergencia - Nombre</label>
-              <input 
-                v-model="nuevoPaciente.contactoEmergenciaNombre" 
-                type="text"
-                @blur="nuevoPaciente.contactoEmergenciaNombre = capitalizarNombre(nuevoPaciente.contactoEmergenciaNombre)"
-                class="form-input"
-              >
-            </div>
-            <div class="form-group">
-              <label class="form-label">Contacto de Emergencia - Teléfono</label>
-              <input 
-                v-model="nuevoPaciente.contactoEmergenciaTelefono" 
-                type="tel"
-                maxlength="10"
-                @keypress="soloNumerosEnteros"
-                placeholder="10 dígitos"
-                class="form-input"
-              >
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label">Nombre del Contacto</label>
+                <input 
+                  v-model="nuevoPaciente.contactoEmergenciaNombre" 
+                  type="text"
+                  @blur="nuevoPaciente.contactoEmergenciaNombre = capitalizarNombre(nuevoPaciente.contactoEmergenciaNombre)"
+                  class="form-input"
+                  placeholder="Nombre completo"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Teléfono del Contacto</label>
+                <input 
+                  v-model="nuevoPaciente.contactoEmergenciaTelefono" 
+                  type="tel"
+                  maxlength="10"
+                  @keypress="soloNumerosEnteros"
+                  placeholder="10 dígitos"
+                  class="form-input"
+                >
+              </div>
             </div>
           </div>
           
-          <div v-if="errorCreacion" class="alert alert-error">
+          <div v-if="errorCreacion" class="alert-error">
             <strong>⚠️ Error:</strong> {{ errorCreacion }}
           </div>
           
-          <div v-if="exitoCreacion" class="alert alert-success">
-            <strong>✅ ¡Éxito!</strong> Paciente {{ modoEdicion ? 'actualizado' : 'creado' }} correctamente.
+          <div v-if="exitoCreacion" class="alert-success">
+            <strong>✓ ¡Éxito!</strong> Paciente {{ modoEdicion ? 'actualizado' : 'creado' }} correctamente.
           </div>
           
-          <div class="modal-actions">
+          <div class="modal-edit-actions">
             <button 
               type="button"
               @click="cancelarFormulario" 
-              class="btn-modal btn-cancel"
+              class="btn-modal-cancel"
             >
               Cancelar
             </button>
             <button 
               type="submit"
               :disabled="guardando"
-              class="btn-modal btn-save"
+              class="btn-modal-submit"
             >
-              {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar Paciente' : 'Guardar Paciente') }}
+              <span v-if="guardando">⏳ Guardando...</span>
+              <span v-else>💾 {{ modoEdicion ? 'Actualizar Paciente' : 'Guardar Paciente' }}</span>
             </button>
           </div>
         </form>
@@ -243,9 +327,13 @@
       <p style="color: #666; margin: 0;">No hay pacientes registrados aún.</p>
     </div>
     
+    <div v-else-if="pacientesFiltrados.length === 0 && busqueda" style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
+      <p style="color: #666; margin: 0;">No se encontraron pacientes que coincidan con "{{ busqueda }}"</p>
+    </div>
+    
     <div v-else class="patients-grid">
       <div 
-        v-for="paciente in pacientes" 
+        v-for="paciente in pacientesFiltrados" 
         :key="paciente.id" 
         class="patient-card"
       >
@@ -366,6 +454,7 @@ export default {
   data() {
     return {
       pacientes: [],
+      busqueda: '',
       loading: false,
       error: null,
       primeraCarga: true,
@@ -383,6 +472,7 @@ export default {
         email: '',
         telefono: '',
         nivelActividad: '',
+        healthGoal: '',
         condicionesMedicas: '',
         alergias: '',
         restriccionesDieteticas: '',
@@ -396,6 +486,22 @@ export default {
       mostrarConfirmacionEliminar: false,
       pacienteAEliminar: null,
       eliminando: false
+    }
+  },
+  computed: {
+    pacientesFiltrados() {
+      if (!this.busqueda) {
+        return this.pacientes
+      }
+      
+      const busquedaLower = this.busqueda.toLowerCase()
+      return this.pacientes.filter(paciente => {
+        const nombreCompleto = `${paciente.firstName} ${paciente.lastName}`.toLowerCase()
+        const email = (paciente.email || '').toLowerCase()
+        
+        return nombreCompleto.includes(busquedaLower) || 
+               email.includes(busquedaLower)
+      })
     }
   },
   mounted() {
@@ -501,6 +607,7 @@ export default {
           email: this.nuevoPaciente.email?.trim() || null,
           phone: this.nuevoPaciente.telefono || null,
           activityLevel: this.nuevoPaciente.nivelActividad || 'SEDENTARIO',
+          healthGoal: this.nuevoPaciente.healthGoal || null,
           medicalConditions: this.nuevoPaciente.condicionesMedicas?.trim() || null,
           allergies: this.nuevoPaciente.alergias?.trim() || null,
           dietaryRestrictions: this.nuevoPaciente.restriccionesDieteticas?.trim() || null,
@@ -545,6 +652,7 @@ export default {
         email: '',
         telefono: '',
         nivelActividad: '',
+        healthGoal: '',
         condicionesMedicas: '',
         alergias: '',
         restriccionesDieteticas: '',
@@ -574,6 +682,7 @@ export default {
         email: paciente.email || '',
         telefono: paciente.phone || '',
         nivelActividad: paciente.activityLevel || '',
+        healthGoal: paciente.healthGoal || '',
         condicionesMedicas: paciente.medicalConditions || '',
         alergias: paciente.allergies || '',
         restriccionesDieteticas: paciente.dietaryRestrictions || '',
@@ -598,6 +707,7 @@ export default {
           email: this.nuevoPaciente.email,
           phone: this.nuevoPaciente.telefono,
           activityLevel: this.nuevoPaciente.nivelActividad,
+          healthGoal: this.nuevoPaciente.healthGoal,
           medicalConditions: this.nuevoPaciente.condicionesMedicas,
           allergies: this.nuevoPaciente.alergias,
           dietaryRestrictions: this.nuevoPaciente.restriccionesDieteticas,
@@ -779,8 +889,73 @@ export default {
   margin: 30px auto;
   padding: 0 30px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Barra de búsqueda */
+.search-container {
+  position: relative;
+  flex: 1;
+  max-width: 500px;
+  min-width: 300px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 50px 14px 50px;
+  border: 2px solid #e0e0e0;
+  border-radius: 30px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #8bc34a;
+  box-shadow: 0 4px 16px rgba(139, 195, 74, 0.2);
+}
+
+.search-input::placeholder {
+  color: #adb5bd;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(139, 195, 74, 0.1);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  color: #8bc34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.clear-search-btn:hover {
+  background: rgba(139, 195, 74, 0.2);
+  transform: translateY(-50%) scale(1.1);
 }
 
 .actions-buttons {
@@ -1066,6 +1241,12 @@ export default {
   .actions-bar {
     flex-direction: column;
     align-items: stretch;
+    padding: 0 20px;
+  }
+  
+  .search-container {
+    max-width: 100%;
+    min-width: 100%;
   }
   
   .actions-buttons {
@@ -1082,7 +1263,7 @@ export default {
   }
 }
 
-/* Modal Overlay */
+/* ===== ESTILOS DEL MODAL DE EDICIÓN MODERNO ===== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1095,9 +1276,9 @@ export default {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 30px 20px;
-  animation: fadeIn 0.3s ease;
   overflow-y: auto;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
@@ -1105,273 +1286,294 @@ export default {
   to { opacity: 1; }
 }
 
-/* Modal Content */
-.modal-content {
+.modal-edit-content {
   background: white;
   border-radius: 20px;
   max-width: 900px;
   width: 100%;
-  max-height: 85vh;
-  display: flex;
-  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
-  position: relative;
 }
 
 @keyframes slideUp {
   from {
-    transform: translateY(50px);
     opacity: 0;
+    transform: translateY(30px);
   }
   to {
-    transform: translateY(0);
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Modal Header */
-.modal-header {
+.modal-edit-header {
   background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
-  padding: 25px 30px;
+  padding: 30px 35px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
   border-radius: 20px 20px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
-.modal-title-section {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.modal-edit-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
 }
 
-.modal-icon {
-  font-size: 32px;
+.modal-header-icon {
+  font-size: 48px;
   filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-.modal-title {
-  margin: 0;
-  color: white;
+.modal-edit-title {
   font-size: 28px;
   font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: white;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.btn-close-modal {
+.modal-edit-subtitle {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 5px 0 0 0;
+}
+
+.modal-close-btn {
   background: rgba(255, 255, 255, 0.2);
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   font-size: 24px;
   cursor: pointer;
   color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  font-weight: 300;
+  margin-left: auto;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
 }
 
-.btn-close-modal:hover {
+.modal-close-btn:hover {
   background: rgba(255, 255, 255, 0.3);
-  transform: rotate(90deg) scale(1.1);
+  transform: rotate(90deg);
 }
 
-/* Modal Form */
-.modal-form {
-  padding: 30px;
-  overflow-y: auto;
-  flex: 1;
+.modal-edit-form {
+  padding: 35px;
 }
 
-/* Form Grid */
+/* Secciones del formulario */
+.form-section {
+  margin-bottom: 30px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 20px;
+}
+
+.form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.form-section-icon {
+  font-size: 28px;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.form-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+/* Grids del formulario */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
-  margin-bottom: 20px;
 }
 
-.form-group {
+.form-grid-full {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.form-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.form-group-full {
-  grid-column: 1 / -1;
 }
 
 .form-label {
   font-weight: 600;
-  color: #2c3e50;
+  color: #495057;
+  margin-bottom: 8px;
   font-size: 14px;
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.form-input,
-.form-select,
-.form-textarea {
+.form-input {
   padding: 12px 15px;
   border: 2px solid #e0e0e0;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: 15px;
   transition: all 0.3s ease;
   background: #f8f9fa;
-  font-family: inherit;
 }
 
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
+.form-input:focus {
   outline: none;
   border-color: #8bc34a;
   background: white;
   box-shadow: 0 0 0 4px rgba(139, 195, 74, 0.1);
 }
 
-.form-input:hover,
-.form-select:hover,
-.form-textarea:hover {
-  border-color: #bdbdbd;
+.form-input::placeholder {
+  color: #adb5bd;
 }
 
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-/* Alerts */
-.alert {
+/* Alertas */
+.alert-error {
+  background: #fee;
+  color: #c33;
   padding: 15px 20px;
   border-radius: 12px;
-  margin-bottom: 20px;
-  font-size: 14px;
+  margin-top: 20px;
+  border-left: 4px solid #c33;
   display: flex;
   align-items: center;
   gap: 10px;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.alert-error {
-  background: rgba(255, 82, 82, 0.1);
-  color: #ff5252;
-  border: 2px solid #ff5252;
 }
 
 .alert-success {
-  background: rgba(139, 195, 74, 0.1);
-  color: #8bc34a;
-  border: 2px solid #8bc34a;
+  background: #d4edda;
+  color: #155724;
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  border-left: 4px solid #28a745;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* Modal Actions */
-.modal-actions {
+/* Botones del modal */
+.modal-edit-actions {
   display: flex;
   gap: 15px;
   justify-content: flex-end;
-  padding-top: 20px;
+  margin-top: 30px;
+  padding-top: 25px;
   border-top: 2px solid #f0f0f0;
 }
 
-.btn-modal {
+.btn-modal-cancel {
   padding: 12px 30px;
+  background: #6c757d;
+  color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
+  font-size: 16px;
   font-weight: 600;
-  font-size: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-modal-cancel:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.btn-modal-submit {
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(139, 195, 74, 0.3);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.btn-modal:disabled {
+.btn-modal-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7ab73f 0%, #6aa62f 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 195, 74, 0.4);
+}
+
+.btn-modal-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none !important;
+  transform: none;
 }
 
-.btn-cancel {
-  background: linear-gradient(135deg, #7a7a5a 0%, #6a6a4a 100%);
-  color: white;
-}
-
-.btn-cancel:hover:not(:disabled) {
-  background: linear-gradient(135deg, #6a6a4a 0%, #5a5a3a 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(122, 122, 90, 0.3);
-}
-
-.btn-save {
-  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
-  color: white;
-}
-
-.btn-save:hover:not(:disabled) {
-  background: linear-gradient(135deg, #7ab73f 0%, #6aa72f 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(139, 195, 74, 0.3);
-}
-
-/* Responsive Modal */
+/* Responsive del modal */
 @media (max-width: 768px) {
   .modal-overlay {
     padding: 10px;
   }
-  
-  .modal-content {
+
+  .modal-edit-content {
     max-height: 95vh;
   }
-  
-  .modal-header {
+
+  .modal-edit-header {
     padding: 20px;
+    flex-wrap: wrap;
   }
-  
-  .modal-title {
+
+  .modal-header-icon {
+    font-size: 36px;
+  }
+
+  .modal-edit-title {
     font-size: 22px;
   }
-  
-  .modal-icon {
-    font-size: 28px;
-  }
-  
-  .modal-form {
+
+  .modal-edit-form {
     padding: 20px;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
-    gap: 15px;
   }
-  
-  .modal-actions {
+
+  .modal-edit-actions {
     flex-direction: column;
   }
-  
-  .btn-modal {
+
+  .btn-modal-cancel,
+  .btn-modal-submit {
     width: 100%;
     justify-content: center;
   }

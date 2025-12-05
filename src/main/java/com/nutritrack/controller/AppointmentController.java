@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/appointments")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:8080"})
 public class AppointmentController {
 
     @Autowired
@@ -72,6 +72,9 @@ public class AppointmentController {
     @PreAuthorize("hasRole('ROLE_NUTRIOLOGO') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> crearCita(@RequestBody Map<String, Object> solicitud, Authentication authentication) {
         try {
+            System.out.println("=== CREAR CITA - DATOS RECIBIDOS ===");
+            System.out.println("Solicitud completa: " + solicitud);
+            
             String nombreUsuario = authentication.getName();
             User nutriologo = userRepository.findByUsername(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Nutriólogo no encontrado"));
@@ -82,15 +85,24 @@ public class AppointmentController {
             String tipoCita = solicitud.get("appointmentType").toString();
             Integer duracion = solicitud.containsKey("duration") ? 
                 Integer.valueOf(solicitud.get("duration").toString()) : 60;
+            
+            System.out.println("PatientId: " + idPaciente);
+            System.out.println("FechaCitaStr: " + fechaCitaStr);
+            System.out.println("TipoCita: " + tipoCita);
+            System.out.println("Duracion: " + duracion);
 
             // Buscar el paciente
             Patient paciente = patientRepository.findById(idPaciente)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
 
-            // Parsear fecha
+            // Parsear fecha (agregar segundos si no están presentes)
+            if (!fechaCitaStr.contains(":00") && fechaCitaStr.length() == 16) {
+                fechaCitaStr += ":00";  // Agregar segundos al formato datetime-local
+            }
             LocalDateTime fechaCita = LocalDateTime.parse(fechaCitaStr);
 
             // Verificar disponibilidad (no debe haber otra cita en el mismo horario)
+            System.out.println("=== VERIFICANDO DISPONIBILIDAD ===");
             LocalDateTime horaFin = fechaCita.plusMinutes(duracion);
             List<Appointment> citasConflicto = appointmentRepository
                 .findByNutritionistAndAppointmentDateBetween(
@@ -98,13 +110,16 @@ public class AppointmentController {
                     fechaCita.minusMinutes(duracion), 
                     horaFin
                 );
+            System.out.println("Citas en conflicto encontradas: " + citasConflicto.size());
 
             if (!citasConflicto.isEmpty()) {
+                System.out.println("ERROR: Ya existe una cita en ese horario");
                 return ResponseEntity.badRequest()
                     .body("Ya existe una cita programada en ese horario");
             }
 
             // Crear nueva cita
+            System.out.println("=== CREANDO NUEVA CITA ===");
             Appointment cita = new Appointment();
             cita.setPatient(paciente);
             cita.setNutritionist(nutriologo);
@@ -112,9 +127,12 @@ public class AppointmentController {
             cita.setDurationMinutes(duracion);
             cita.setAppointmentType(tipoCita);
             cita.setStatus("SCHEDULED");
+            System.out.println("Cita creada en memoria, intentando guardar...");
 
             // Guardar
             Appointment citaGuardada = appointmentRepository.save(cita);
+            System.out.println("=== CITA GUARDADA EXITOSAMENTE ===");
+            System.out.println("ID de cita guardada: " + citaGuardada.getId());
             
             return ResponseEntity.ok(Map.of(
                 "message", "Cita creada exitosamente",
@@ -122,6 +140,7 @@ public class AppointmentController {
             ));
 
         } catch (Exception e) {
+            e.printStackTrace();  // Esto imprimirá el stack trace completo en la consola
             return ResponseEntity.badRequest()
                 .body("Error al crear cita: " + e.getMessage());
         }

@@ -64,12 +64,23 @@
           
           <div class="form-group">
             <label>Contraseña</label>
-            <input 
-              type="password" 
-              v-model="form.password" 
-              required
-              placeholder="Ingresa tu contraseña"
-            />
+            <div class="password-input-container">
+              <input 
+                :type="mostrarPassword ? 'text' : 'password'" 
+                v-model="form.password" 
+                required
+                placeholder="Ingresa tu contraseña"
+                class="password-input"
+              />
+              <button 
+                type="button"
+                @click="mostrarPassword = !mostrarPassword"
+                class="toggle-password-btn"
+                :title="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              >
+                {{ mostrarPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
+            </div>
           </div>
           
           <button type="submit" :disabled="loading" class="login-button">
@@ -109,7 +120,8 @@ export default {
         password: ''
       },
       loading: false,
-      error: null
+      error: null,
+      mostrarPassword: false
     }
   },
   methods: {
@@ -291,6 +303,41 @@ export default {
   outline: none;
   border-color: #7cb342;
   box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.1);
+}
+
+/* Contenedor de input de contraseña */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  flex: 1;
+  padding-right: 45px !important;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+}
+
+.toggle-password-btn:hover {
+  background: rgba(124, 179, 66, 0.1);
+}
+
+.toggle-password-btn:active {
+  transform: scale(0.95);
 }
 
 .login-button {

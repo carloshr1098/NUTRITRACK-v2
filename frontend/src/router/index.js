@@ -10,11 +10,13 @@ import AdminUsersView from '../views/admin/AdminUsersView.vue'
 import AdminReportsView from '../views/admin/AdminReportsView.vue'
 
 // Nutritionist views
+import NutritionistDashboardView from '../views/nutritionist/NutritionistDashboardView.vue'
 import NutritionistPatientsView from '../views/nutritionist/NutritionistPatientsView.vue'
 import NutritionistAppointmentsView from '../views/nutritionist/NutritionistAppointmentsView.vue'
 import NutritionistDietPlansView from '../views/nutritionist/NutritionistDietPlansView.vue'
 import NutritionistFoodsView from '../views/nutritionist/NutritionistFoodsView.vue'
 import NutritionistProfileView from '../views/nutritionist/NutritionistProfileView.vue'
+import NutritionistSettingsView from '../views/nutritionist/NutritionistSettingsView.vue'
 import PatientDetailView from '../views/nutritionist/PatientDetailView.vue'
 
 // Patient views
@@ -50,12 +52,12 @@ const routes = [
     meta: { requiresAuth: true, roles: ['ROLE_ADMIN'] }
   },
   // Rutas del Nutriólogo
-  // {
-  //   path: '/nutricionista/dashboard',
-  //   name: 'NutricionistaDashboard',
-  //   component: NutritionistDashboardView,
-  //   meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
-  // },
+  {
+    path: '/nutritionist/dashboard',
+    name: 'NutritionistDashboard',
+    component: NutritionistDashboardView,
+    meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
+  },
   {
     path: '/nutriologo/pacientes',
     name: 'NutriologoPacientes',
@@ -90,6 +92,12 @@ const routes = [
     path: '/nutriologo/perfil',
     name: 'NutriologoPerfil',
     component: NutritionistProfileView,
+    meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
+  },
+  {
+    path: '/nutriologo/configuracion',
+    name: 'NutriologoConfiguracion',
+    component: NutritionistSettingsView,
     meta: { requiresAuth: true, roles: ['ROLE_NUTRIOLOGO', 'ROLE_ADMIN'] }
   },
   // Rutas del Paciente

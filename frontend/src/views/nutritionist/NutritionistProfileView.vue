@@ -189,6 +189,72 @@
 
           <v-divider class="my-6"></v-divider>
 
+          <!-- Cambiar Contraseña -->
+          <v-row>
+            <v-col cols="12">
+              <div class="section-title">
+                <div class="section-icon">🔒</div>
+                <span>Seguridad</span>
+              </div>
+            </v-col>
+
+            <v-col cols="12" md="4">
+              <v-text-field
+                v-model="cambioPassword.actual"
+                :type="mostrarPasswordActual ? 'text' : 'password'"
+                label="Contraseña Actual"
+                outlined
+                dense
+                prepend-inner-icon="mdi-lock"
+                :append-inner-icon="mostrarPasswordActual ? 'mdi-eye-off' : 'mdi-eye'"
+                @click:append-inner="mostrarPasswordActual = !mostrarPasswordActual"
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12" md="4">
+              <v-text-field
+                v-model="cambioPassword.nueva"
+                :type="mostrarPasswordNueva ? 'text' : 'password'"
+                label="Contraseña Nueva"
+                outlined
+                dense
+                prepend-inner-icon="mdi-lock-outline"
+                :append-inner-icon="mostrarPasswordNueva ? 'mdi-eye-off' : 'mdi-eye'"
+                @click:append-inner="mostrarPasswordNueva = !mostrarPasswordNueva"
+                :rules="cambioPassword.actual ? [rules.minLength] : []"
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12" md="4">
+              <v-text-field
+                v-model="cambioPassword.confirmar"
+                :type="mostrarPasswordConfirmar ? 'text' : 'password'"
+                label="Confirmar Contraseña"
+                outlined
+                dense
+                prepend-inner-icon="mdi-lock-check"
+                :append-inner-icon="mostrarPasswordConfirmar ? 'mdi-eye-off' : 'mdi-eye'"
+                @click:append-inner="mostrarPasswordConfirmar = !mostrarPasswordConfirmar"
+                :rules="cambioPassword.nueva ? [rules.passwordMatch] : []"
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12">
+              <v-btn
+                color="warning"
+                :loading="cambiandoPassword"
+                :disabled="!puedecambiarPassword"
+                @click="cambiarPassword"
+                class="btn-change-password"
+              >
+                <v-icon left>mdi-key-variant</v-icon>
+                Cambiar Contraseña
+              </v-btn>
+            </v-col>
+          </v-row>
+
+          <v-divider class="my-6"></v-divider>
+
           <!-- Vista Previa -->
           <v-row v-if="perfil.degree || perfil.university || perfil.professionalLicense">
             <v-col cols="12">
@@ -329,10 +395,21 @@ export default {
         'Escuela Superior de Medicina (ESM-IPN)',
         'Otra'
       ],
+      cambioPassword: {
+        actual: '',
+        nueva: '',
+        confirmar: ''
+      },
+      mostrarPasswordActual: false,
+      mostrarPasswordNueva: false,
+      mostrarPasswordConfirmar: false,
+      cambiandoPassword: false,
       rules: {
         required: value => !!value || 'Campo requerido',
         cedula: value => !value || /^\d{7}$/.test(value) || 'La cédula debe tener exactamente 7 dígitos',
-        telefono: value => !value || /^\d{10}$/.test(value) || 'El teléfono debe tener exactamente 10 dígitos'
+        telefono: value => !value || /^\d{10}$/.test(value) || 'El teléfono debe tener exactamente 10 dígitos',
+        minLength: value => !value || value.length >= 6 || 'La contraseña debe tener al menos 6 caracteres',
+        passwordMatch: value => value === this.cambioPassword.nueva || 'Las contraseñas no coinciden'
       },
       snackbar: false,
       snackbarText: '',
@@ -343,6 +420,13 @@ export default {
     cambiosRealizados() {
       if (!this.perfilOriginal) return false
       return JSON.stringify(this.perfil) !== JSON.stringify(this.perfilOriginal)
+    },
+    puedecambiarPassword() {
+      return this.cambioPassword.actual && 
+             this.cambioPassword.nueva && 
+             this.cambioPassword.confirmar &&
+             this.cambioPassword.nueva.length >= 6 &&
+             this.cambioPassword.nueva === this.cambioPassword.confirmar
     }
   },
   mounted() {
@@ -450,6 +534,30 @@ export default {
         this.mostrarMensaje('Error al guardar el perfil', 'error')
       } finally {
         this.guardando = false
+      }
+    },
+    async cambiarPassword() {
+      if (!this.puedecambiarPassword) return
+
+      this.cambiandoPassword = true
+      try {
+        await api.put('/auth/change-password', {
+          currentPassword: this.cambioPassword.actual,
+          newPassword: this.cambioPassword.nueva
+        })
+
+        // Limpiar los campos
+        this.cambioPassword.actual = ''
+        this.cambioPassword.nueva = ''
+        this.cambioPassword.confirmar = ''
+        
+        this.mostrarMensaje('Contraseña actualizada correctamente', 'success')
+      } catch (error) {
+        console.error('Error al cambiar contraseña:', error)
+        const mensaje = error.response?.data?.message || 'Error al cambiar la contraseña. Verifica tu contraseña actual.'
+        this.mostrarMensaje(mensaje, 'error')
+      } finally {
+        this.cambiandoPassword = false
       }
     },
     mostrarMensaje(texto, color) {
@@ -604,7 +712,7 @@ export default {
   border-top: 2px solid rgba(139, 195, 74, 0.2);
 }
 
-/* Botón de guardar */
+/* Botones */
 .btn-save {
   background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%) !important;
   color: white !important;
@@ -623,6 +731,27 @@ export default {
 }
 
 .btn-save:disabled {
+  opacity: 0.5;
+  transform: none !important;
+}
+
+.btn-change-password {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  padding: 12px 30px !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3) !important;
+}
+
+.btn-change-password:hover {
+  background: linear-gradient(135deg, #f57c00 0%, #e65100 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4) !important;
+}
+
+.btn-change-password:disabled {
   opacity: 0.5;
   transform: none !important;
 }

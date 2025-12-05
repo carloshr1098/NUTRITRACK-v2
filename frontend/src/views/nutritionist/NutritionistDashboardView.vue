@@ -216,33 +216,136 @@
       </v-col>
     </v-row>
 
-    <!-- Accesos rápidos -->
+    <!-- Reportes y Análisis Detallado -->
     <v-row class="mt-4">
       <v-col cols="12">
-        <v-card elevation="2" class="quick-actions-card">
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2" color="orange">mdi-lightning-bolt</v-icon>
-            Accesos Rápidos
+        <v-card elevation="2" class="reports-card">
+          <v-card-title class="d-flex align-center bg-gradient-purple text-white">
+            <v-icon class="mr-2">mdi-chart-box-outline</v-icon>
+            Reportes y Análisis
+            <v-spacer></v-spacer>
+            <v-btn 
+              color="white" 
+              variant="outlined" 
+              size="small"
+              @click="exportarReportes"
+              prepend-icon="mdi-download"
+            >
+              Exportar
+            </v-btn>
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="6" sm="3" md="2" v-for="(accion, index) in accionesRapidas" :key="index">
-                <v-card
-                  class="quick-action-btn text-center pa-4"
-                  :color="accion.color"
-                  variant="tonal"
-                  @click="navegarA(accion.ruta)"
-                  hover
-                >
-                  <v-icon size="48" :color="accion.color">{{ accion.icon }}</v-icon>
-                  <div class="text-caption font-weight-medium mt-2">{{ accion.nombre }}</div>
-                </v-card>
+              <!-- Usuarios Nuevos Registrados -->
+              <v-col cols="12" md="6">
+                <div class="report-section">
+                  <h3 class="section-title">
+                    <v-icon color="success" class="mr-2">mdi-account-multiple-plus</v-icon>
+                    Usuarios Nuevos Registrados
+                  </h3>
+                  <div style="height: 300px;">
+                    <line-chart 
+                      v-if="usuariosNuevosChartData"
+                      :chart-data="usuariosNuevosChartData"
+                      :chart-options="usuariosNuevosChartOptions"
+                    />
+                  </div>
+                  <v-row class="mt-4">
+                    <v-col cols="4" class="text-center">
+                      <div class="stat-number text-primary">{{ stats.nuevosEsteMes }}</div>
+                      <div class="stat-label">Este Mes</div>
+                    </v-col>
+                    <v-col cols="4" class="text-center">
+                      <div class="stat-number text-success">{{ stats.nuevosEstaSemana }}</div>
+                      <div class="stat-label">Esta Semana</div>
+                    </v-col>
+                    <v-col cols="4" class="text-center">
+                      <div class="stat-number text-info">{{ stats.totalUsuarios }}</div>
+                      <div class="stat-label">Total</div>
+                    </v-col>
+                  </v-row>
+                </div>
+              </v-col>
+
+              <!-- Citas por Mes -->
+              <v-col cols="12" md="6">
+                <div class="report-section">
+                  <h3 class="section-title">
+                    <v-icon color="primary" class="mr-2">mdi-calendar-month</v-icon>
+                    Citas por Mes
+                  </h3>
+                  <div style="height: 300px;">
+                    <line-chart 
+                      v-if="citasPorMesChartData"
+                      :chart-data="citasPorMesChartData"
+                      :chart-options="citasPorMesChartOptions"
+                    />
+                  </div>
+                  <v-row class="mt-4">
+                    <v-col cols="4" class="text-center">
+                      <div class="stat-number text-success">{{ stats.citasEsteMes }}</div>
+                      <div class="stat-label">Este Mes</div>
+                    </v-col>
+                    <v-col cols="4" class="text-center">
+                      <div class="stat-number text-warning">{{ stats.citasPendientes }}</div>
+                      <div class="stat-label">Pendientes</div>
+                    </v-col>
+                    <v-col cols="4" class="text-center">
+                      <div class="stat-number text-info">{{ stats.citasCompletadas }}</div>
+                      <div class="stat-label">Completadas</div>
+                    </v-col>
+                  </v-row>
+                </div>
+              </v-col>
+            </v-row>
+
+            <!-- Planes de Dieta Generados -->
+            <v-row class="mt-4">
+              <v-col cols="12">
+                <div class="report-section">
+                  <h3 class="section-title">
+                    <v-icon color="orange" class="mr-2">mdi-food-apple</v-icon>
+                    Planes de Dieta Generados
+                  </h3>
+                  <v-row>
+                    <!-- Gráfico de barras -->
+                    <v-col cols="12" md="8">
+                      <div style="height: 300px;">
+                        <line-chart 
+                          v-if="planesDietaChartData"
+                          :chart-data="planesDietaChartData"
+                          :chart-options="planesDietaChartOptions"
+                        />
+                      </div>
+                    </v-col>
+                    
+                    <!-- Estadísticas de planes -->
+                    <v-col cols="12" md="4">
+                      <v-row>
+                        <v-col cols="6" md="12" v-for="(tipo, index) in tiposPlanes" :key="index">
+                          <v-card class="plan-stat-card" :class="`border-left-${tipo.color}`">
+                            <v-card-text class="pa-3">
+                              <div class="d-flex align-center">
+                                <v-icon :color="tipo.color" size="32" class="mr-3">{{ tipo.icon }}</v-icon>
+                                <div>
+                                  <div class="plan-stat-value" :class="`text-${tipo.color}`">{{ tipo.cantidad }}</div>
+                                  <div class="plan-stat-label">{{ tipo.nombre }}</div>
+                                </div>
+                              </div>
+                            </v-card-text>
+                          </v-card>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                  </v-row>
+                </div>
               </v-col>
             </v-row>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
+
   </v-container>
 </template>
 
@@ -274,7 +377,15 @@ export default {
         planesActivos: 0,
         planesCompletados: 0,
         progresoPromedio: 0,
-        pacientesEnMeta: 0
+        pacientesEnMeta: 0,
+        pacientesEnProgreso: 0,
+        pacientesRetrasados: 0,
+        nuevosEsteMes: 0,
+        nuevosEstaSemana: 0,
+        totalUsuarios: 0,
+        citasEsteMes: 0,
+        citasPendientes: 0,
+        citasCompletadas: 0
       },
       proximasCitas: [],
       actividadReciente: [],
@@ -286,6 +397,136 @@ export default {
         { nombre: 'Reportes', icon: 'mdi-chart-box', color: '#FF0000', ruta: '/admin/reportes' },
         { nombre: 'Seguimiento', icon: 'mdi-chart-line', color: '#FF01FF', ruta: '/nutricionista/pacientes' }
       ],
+      tiposPlanes: [
+        {
+          nombre: 'Pérdida de Peso',
+          cantidad: 28,
+          icon: 'mdi-weight-lifter',
+          color: 'success'
+        },
+        {
+          nombre: 'Ganancia Muscular',
+          cantidad: 15,
+          icon: 'mdi-dumbbell',
+          color: 'primary'
+        },
+        {
+          nombre: 'Mantenimiento',
+          cantidad: 22,
+          icon: 'mdi-heart-pulse',
+          color: 'info'
+        },
+        {
+          nombre: 'Especiales',
+          cantidad: 8,
+          icon: 'mdi-star',
+          color: 'warning'
+        }
+      ],
+      usuariosNuevosChartData: null,
+      usuariosNuevosChartOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        }
+      },
+      citasPorMesChartData: null,
+      citasPorMesChartOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 5
+            }
+          }
+        }
+      },
+      planesDietaChartData: null,
+      planesDietaChartOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 2
+            }
+          }
+        }
+      },
+      objetivosChartData: {
+        labels: ['En Meta', 'En Progreso', 'Retrasados'],
+        datasets: [{
+          data: [15, 12, 8],
+          backgroundColor: [
+            'rgba(76, 175, 80, 0.8)',
+            'rgba(255, 152, 0, 0.8)',
+            'rgba(244, 67, 54, 0.8)'
+          ],
+          borderColor: [
+            'rgba(76, 175, 80, 1)',
+            'rgba(255, 152, 0, 1)',
+            'rgba(244, 67, 54, 1)'
+          ],
+          borderWidth: 2
+        }]
+      },
+      objetivosChartOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              font: {
+                size: 13
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} pacientes (${percentage}%)`;
+              }
+            }
+          }
+        }
+      },
       pesoChartData: null,
       pesoChartOptions: {
         responsive: true,
@@ -334,6 +575,29 @@ export default {
     currentDate() {
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
       return new Date().toLocaleDateString('es-ES', options)
+    },
+    objetivosChartDataComputed() {
+      return {
+        labels: ['En Meta', 'En Progreso', 'Retrasados'],
+        datasets: [{
+          data: [
+            this.stats.pacientesEnMeta,
+            this.stats.pacientesEnProgreso,
+            this.stats.pacientesRetrasados
+          ],
+          backgroundColor: [
+            'rgba(76, 175, 80, 0.8)',
+            'rgba(255, 152, 0, 0.8)',
+            'rgba(244, 67, 54, 0.8)'
+          ],
+          borderColor: [
+            'rgba(76, 175, 80, 1)',
+            'rgba(255, 152, 0, 1)',
+            'rgba(244, 67, 54, 1)'
+          ],
+          borderWidth: 2
+        }]
+      }
     }
   },
   async mounted() {
@@ -352,7 +616,10 @@ export default {
           this.cargarProximasCitas(),
           this.cargarActividadReciente(),
           this.cargarGraficaPeso(),
-          this.cargarGraficaCitas()
+          this.cargarGraficaCitas(),
+          this.cargarGraficaUsuariosNuevos(),
+          this.cargarGraficaCitasPorMes(),
+          this.cargarGraficaPlanesDieta()
         ])
       } catch (error) {
         console.error('Error al cargar datos del dashboard:', error)
@@ -387,7 +654,9 @@ export default {
         
         // Estadísticas adicionales
         this.stats.progresoPromedio = Math.floor(Math.random() * 30) + 60
-        this.stats.pacientesEnMeta = Math.floor(this.stats.totalPacientes * 0.6)
+        this.stats.pacientesEnMeta = Math.floor(this.stats.totalPacientes * 0.43)
+        this.stats.pacientesEnProgreso = Math.floor(this.stats.totalPacientes * 0.34)
+        this.stats.pacientesRetrasados = Math.floor(this.stats.totalPacientes * 0.23)
         
       } catch (error) {
         console.error('Error al cargar estadísticas:', error)
@@ -502,6 +771,245 @@ export default {
       }
     },
     
+    async cargarGraficaUsuariosNuevos() {
+      try {
+        const response = await api.get('/pacientes')
+        const pacientes = response.data
+        
+        // Calcular usuarios nuevos por mes (últimos 6 meses)
+        const hoy = new Date()
+        const meses = []
+        const conteoMeses = []
+        
+        for (let i = 5; i >= 0; i--) {
+          const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1)
+          const nombreMes = fecha.toLocaleDateString('es-ES', { month: 'long' })
+          meses.push(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
+          
+          // Contar pacientes creados en ese mes
+          const pacientesMes = pacientes.filter(p => {
+            if (!p.createdAt) return false
+            const fechaCreacion = new Date(p.createdAt)
+            return fechaCreacion.getMonth() === fecha.getMonth() && 
+                   fechaCreacion.getFullYear() === fecha.getFullYear()
+          }).length
+          
+          conteoMeses.push(pacientesMes)
+        }
+        
+        this.usuariosNuevosChartData = {
+          labels: meses,
+          datasets: [
+            {
+              label: 'Usuarios Nuevos',
+              data: conteoMeses,
+              borderColor: '#4CAF50',
+              backgroundColor: 'rgba(76, 175, 80, 0.2)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              pointBackgroundColor: '#4CAF50',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2
+            }
+          ]
+        }
+        
+        // Calcular stats
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1)
+        const inicioSemana = new Date(hoy)
+        inicioSemana.setDate(hoy.getDate() - hoy.getDay())
+        
+        this.stats.nuevosEsteMes = pacientes.filter(p => 
+          p.createdAt && new Date(p.createdAt) >= inicioMes
+        ).length
+        
+        this.stats.nuevosEstaSemana = pacientes.filter(p => 
+          p.createdAt && new Date(p.createdAt) >= inicioSemana
+        ).length
+        
+        this.stats.totalUsuarios = pacientes.length
+        
+      } catch (error) {
+        console.error('Error al cargar gráfica de usuarios nuevos:', error)
+      }
+    },
+    
+    async cargarGraficaCitasPorMes() {
+      try {
+        const response = await api.get('/appointments')
+        const citas = response.data
+        
+        // Calcular citas por mes (últimos 6 meses)
+        const hoy = new Date()
+        const meses = []
+        const completadasMes = []
+        const pendientesMes = []
+        
+        for (let i = 5; i >= 0; i--) {
+          const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1)
+          const nombreMes = fecha.toLocaleDateString('es-ES', { month: 'long' })
+          meses.push(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
+          
+          // Contar citas del mes
+          const citasMes = citas.filter(c => {
+            if (!c.appointmentDate) return false
+            const fechaCita = new Date(c.appointmentDate)
+            return fechaCita.getMonth() === fecha.getMonth() && 
+                   fechaCita.getFullYear() === fecha.getFullYear()
+          })
+          
+          const completadas = citasMes.filter(c => c.status === 'COMPLETADA').length
+          const pendientes = citasMes.filter(c => c.status === 'PENDIENTE' || c.status === 'CONFIRMADA').length
+          
+          completadasMes.push(completadas)
+          pendientesMes.push(pendientes)
+        }
+        
+        this.citasPorMesChartData = {
+          labels: meses,
+          datasets: [
+            {
+              label: 'Completadas',
+              data: completadasMes,
+              borderColor: '#4CAF50',
+              backgroundColor: 'rgba(76, 175, 80, 0.2)',
+              fill: true,
+              tension: 0.4
+            },
+            {
+              label: 'Pendientes',
+              data: pendientesMes,
+              borderColor: '#FF9800',
+              backgroundColor: 'rgba(255, 152, 0, 0.2)',
+              fill: true,
+              tension: 0.4
+            }
+          ]
+        }
+        
+        // Calcular stats del mes actual
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1)
+        const citasEsteMes = citas.filter(c => {
+          if (!c.appointmentDate) return false
+          return new Date(c.appointmentDate) >= inicioMes
+        })
+        
+        this.stats.citasEsteMes = citasEsteMes.length
+        this.stats.citasPendientes = citasEsteMes.filter(c => 
+          c.status === 'PENDIENTE' || c.status === 'CONFIRMADA'
+        ).length
+        this.stats.citasCompletadas = citasEsteMes.filter(c => 
+          c.status === 'COMPLETADA'
+        ).length
+        
+      } catch (error) {
+        console.error('Error al cargar gráfica de citas por mes:', error)
+      }
+    },
+    
+    async cargarGraficaPlanesDieta() {
+      try {
+        const response = await api.get('/diet-plans')
+        const planes = response.data
+        
+        // Calcular planes por mes (últimos 6 meses)
+        const hoy = new Date()
+        const meses = []
+        const perdidaPeso = []
+        const gananciaMuscular = []
+        const mantenimiento = []
+        
+        // Contadores totales por tipo
+        let totalPerdida = 0
+        let totalGanancia = 0
+        let totalMantenimiento = 0
+        let totalEspeciales = 0
+        
+        for (let i = 5; i >= 0; i--) {
+          const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1)
+          const nombreMes = fecha.toLocaleDateString('es-ES', { month: 'long' })
+          meses.push(nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1))
+          
+          // Contar planes del mes por tipo (basado en goals)
+          const planesMes = planes.filter(p => {
+            if (!p.createdAt) return false
+            const fechaCreacion = new Date(p.createdAt)
+            return fechaCreacion.getMonth() === fecha.getMonth() && 
+                   fechaCreacion.getFullYear() === fecha.getFullYear()
+          })
+          
+          const perdida = planesMes.filter(p => 
+            p.goals && (p.goals.toLowerCase().includes('perder') || 
+                       p.goals.toLowerCase().includes('pérdida') ||
+                       p.goals.toLowerCase().includes('bajar peso'))
+          ).length
+          
+          const ganancia = planesMes.filter(p => 
+            p.goals && (p.goals.toLowerCase().includes('ganar') || 
+                       p.goals.toLowerCase().includes('músculo') ||
+                       p.goals.toLowerCase().includes('masa'))
+          ).length
+          
+          const manten = planesMes.filter(p => 
+            p.goals && (p.goals.toLowerCase().includes('mantener') || 
+                       p.goals.toLowerCase().includes('mantenimiento'))
+          ).length
+          
+          const otros = planesMes.length - perdida - ganancia - manten
+          
+          perdidaPeso.push(perdida)
+          gananciaMuscular.push(ganancia)
+          mantenimiento.push(manten)
+          
+          totalPerdida += perdida
+          totalGanancia += ganancia
+          totalMantenimiento += manten
+          totalEspeciales += otros
+        }
+        
+        this.planesDietaChartData = {
+          labels: meses,
+          datasets: [
+            {
+              label: 'Pérdida de Peso',
+              data: perdidaPeso,
+              borderColor: '#4CAF50',
+              backgroundColor: 'rgba(76, 175, 80, 0.2)',
+              fill: true,
+              tension: 0.4
+            },
+            {
+              label: 'Ganancia Muscular',
+              data: gananciaMuscular,
+              borderColor: '#2196F3',
+              backgroundColor: 'rgba(33, 150, 243, 0.2)',
+              fill: true,
+              tension: 0.4
+            },
+            {
+              label: 'Mantenimiento',
+              data: mantenimiento,
+              borderColor: '#00BCD4',
+              backgroundColor: 'rgba(0, 188, 212, 0.2)',
+              fill: true,
+              tension: 0.4
+            }
+          ]
+        }
+        
+        // Actualizar contadores en las tarjetas
+        this.tiposPlanes[0].cantidad = totalPerdida
+        this.tiposPlanes[1].cantidad = totalGanancia
+        this.tiposPlanes[2].cantidad = totalMantenimiento
+        this.tiposPlanes[3].cantidad = totalEspeciales
+        
+      } catch (error) {
+        console.error('Error al cargar gráfica de planes de dieta:', error)
+      }
+    },
+    
     formatearTipoCita(tipo) {
       const tipos = {
         'PRIMERA_CONSULTA': 'Primera Consulta',
@@ -577,6 +1085,36 @@ export default {
     
     navegarA(ruta) {
       this.$router.push(ruta)
+    },
+    
+    exportarReportes() {
+      // Preparar datos para exportación
+      const fecha = new Date().toLocaleDateString('es-ES')
+      const reporte = {
+        fecha,
+        estadisticas: this.stats,
+        topPacientes: this.topPacientes,
+        metricasMensuales: this.metricasMensuales,
+        objetivos: {
+          enMeta: this.stats.pacientesEnMeta,
+          enProgreso: this.stats.pacientesEnProgreso,
+          retrasados: this.stats.pacientesRetrasados
+        }
+      }
+      
+      // Simular descarga (en producción conectar con servicio de exportación)
+      console.log('📊 Exportando reporte:', reporte)
+      
+      // Crear blob con datos JSON como ejemplo
+      const dataStr = JSON.stringify(reporte, null, 2)
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr)
+      
+      const exportFileDefaultName = `reporte_nutritrack_${fecha.replace(/\//g, '-')}.json`
+      
+      const linkElement = document.createElement('a')
+      linkElement.setAttribute('href', dataUri)
+      linkElement.setAttribute('download', exportFileDefaultName)
+      linkElement.click()
     }
   }
 }
@@ -740,5 +1278,167 @@ export default {
 
 :deep(.v-timeline-item) {
   padding-bottom: 16px;
+}
+
+/* Estilos para la nueva sección de reportes */
+.reports-card {
+  border-radius: 16px;
+  border-top: 4px solid #9c27b0;
+  background: white;
+  overflow: hidden;
+}
+
+.bg-gradient-purple {
+  background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%) !important;
+  border-radius: 12px 12px 0 0;
+  padding: 16px 20px;
+}
+
+.report-section {
+  padding: 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafb 100%);
+  height: 100%;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.progress-list {
+  background: transparent !important;
+}
+
+.progress-item {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.progress-item:hover {
+  transform: translateX(8px);
+  border-color: #8bc34a;
+  box-shadow: 0 8px 16px rgba(139, 195, 74, 0.15);
+}
+
+.rank-badge {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.rank-number {
+  color: white;
+  font-weight: 700;
+}
+
+.metric-card {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 2px solid #f0f0f0;
+  background: white;
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 8px 0;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.border-primary {
+  border-top: 4px solid #2196F3 !important;
+}
+
+.border-success {
+  border-top: 4px solid #4CAF50 !important;
+}
+
+.border-info {
+  border-top: 4px solid #00BCD4 !important;
+}
+
+.border-orange {
+  border-top: 4px solid #FF9800 !important;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+:deep(.v-list-item-subtitle) {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+:deep(.v-chip) {
+  font-weight: 600;
+}
+
+.plan-stat-card {
+  border-radius: 12px;
+  border-left: 4px solid;
+  transition: all 0.3s ease;
+  background: white;
+  margin-bottom: 12px;
+}
+
+.plan-stat-card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.border-left-success {
+  border-left-color: #4CAF50 !important;
+}
+
+.border-left-primary {
+  border-left-color: #2196F3 !important;
+}
+
+.border-left-info {
+  border-left-color: #00BCD4 !important;
+}
+
+.border-left-warning {
+  border-left-color: #FF9800 !important;
+}
+
+.plan-stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.plan-stat-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 4px;
 }
 </style>

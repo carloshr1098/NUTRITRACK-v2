@@ -315,10 +315,11 @@ export const generarPDFPlanDietético = async (planInfo, comidas, resumen, pacie
   
   // ============ COMIDAS POR TIPO (ULTRA COMPACTO Y MODERNO) ============
   const tiposComida = [
-    { tipo: 'BREAKFAST', nombre: 'DESAYUNO', color: [255, 193, 7] },
-    { tipo: 'SNACK', nombre: 'SNACK', color: [156, 39, 176] },
-    { tipo: 'LUNCH', nombre: 'COMIDA', color: [244, 67, 54] },
-    { tipo: 'DINNER', nombre: 'CENA', color: [63, 81, 181] }
+    { tipo: 'DESAYUNO', nombre: 'DESAYUNO', color: [255, 193, 7] },
+    { tipo: 'COLACION_AM', nombre: 'COLACIÓN AM', color: [156, 39, 176] },
+    { tipo: 'ALMUERZO', nombre: 'ALMUERZO', color: [244, 67, 54] },
+    { tipo: 'COLACION_PM', nombre: 'COLACIÓN PM', color: [103, 58, 183] },
+    { tipo: 'CENA', nombre: 'CENA', color: [63, 81, 181] }
   ]
   
   tiposComida.forEach(({ tipo, nombre, color }) => {

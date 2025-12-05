@@ -63,6 +63,16 @@
           Ver Perfil
         </router-link>
       </div>
+
+      <!-- Card para Estadísticas -->
+      <div class="action-card card-estadisticas">
+        <div class="card-icon">📊</div>
+        <h3 class="card-title">Estadísticas</h3>
+        <p class="card-description">Reportes y análisis detallados</p>
+        <router-link to="/nutritionist/dashboard" class="card-button btn-estadisticas">
+          Ver Estadísticas
+        </router-link>
+      </div>
       
     </div>
     
@@ -270,6 +280,10 @@ export default {
   border-top-color: #7a7a5a;
 }
 
+.card-estadisticas {
+  border-top-color: #9c27b0;
+}
+
 .card-icon {
   font-size: 4rem;
   margin-bottom: 20px;
@@ -359,6 +373,16 @@ export default {
   background: linear-gradient(135deg, #6a6a4a 0%, #5a5a3a 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(122, 122, 90, 0.4);
+}
+
+.btn-estadisticas {
+  background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+}
+
+.btn-estadisticas:hover {
+  background: linear-gradient(135deg, #7b1fa2 0%, #6a1b9a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
 }
 
 .logout-container {

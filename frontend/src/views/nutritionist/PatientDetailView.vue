@@ -87,6 +87,79 @@
         </div>
       </div>
 
+      <!-- Evaluación Nutricional -->
+      <div class="modern-card assessment-card">
+        <div class="card-header-section">
+          <h2 class="card-title">
+            <span class="title-icon">📋</span>
+            Evaluación Nutricional
+          </h2>
+          <button 
+            @click="toggleEvaluacionNutricional"
+            class="btn-action btn-assessment"
+          >
+            <span>{{ mostrarEvaluacionNutricional ? '✖' : (latestAssessment ? '📝' : '➕') }}</span>
+            {{ mostrarEvaluacionNutricional ? 'Cancelar' : (latestAssessment ? 'Actualizar Evaluación' : 'Nueva Evaluación') }}
+          </button>
+        </div>
+
+        <!-- Resumen de la última evaluación -->
+        <div v-if="!mostrarEvaluacionNutricional && latestAssessment" class="assessment-summary">
+          <div class="summary-header">
+            <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Última Evaluación</h3>
+            <p style="margin: 0; color: #666; font-size: 14px;">
+              {{ formatearFecha(latestAssessment.assessmentDate) }}
+            </p>
+          </div>
+          
+          <div class="summary-grid">
+            <div class="summary-item">
+              <strong>IMC:</strong> {{ latestAssessment.bmi || 'N/A' }}
+            </div>
+            <div class="summary-item">
+              <strong>Peso:</strong> {{ latestAssessment.weight ? latestAssessment.weight + ' kg' : 'N/A' }}
+            </div>
+            <div class="summary-item">
+              <strong>% Grasa:</strong> {{ latestAssessment.bodyFatPercentage ? latestAssessment.bodyFatPercentage + '%' : 'N/A' }}
+            </div>
+            <div class="summary-item">
+              <strong>Objetivo:</strong> {{ getWeightGoalText(latestAssessment.weightGoal) }}
+            </div>
+            <div class="summary-item">
+              <strong>Actividad:</strong> {{ getActivityLevelText(latestAssessment.physicalActivityLevel) }}
+            </div>
+            <div class="summary-item">
+              <strong>Comidas/día:</strong> {{ latestAssessment.mealsPerDay || 'N/A' }}
+            </div>
+          </div>
+          
+          <button 
+            @click="verEvaluacionCompleta"
+            class="btn-view-full"
+          >
+            👁️ Ver Evaluación Completa
+          </button>
+        </div>
+
+        <!-- Formulario de evaluación -->
+        <div v-if="mostrarEvaluacionNutricional">
+          <NutritionalAssessmentForm
+            :patient-id="paciente.id"
+            :assessment-id="latestAssessment ? latestAssessment.id : null"
+            @saved="onAssessmentSaved"
+            @cancel="mostrarEvaluacionNutricional = false"
+          />
+        </div>
+
+        <!-- Sin evaluaciones -->
+        <div v-if="!mostrarEvaluacionNutricional && !latestAssessment && !loadingAssessments" 
+             style="text-align: center; padding: 40px; color: #666;">
+          <p style="font-size: 18px; margin-bottom: 10px;">📋</p>
+          <p>No hay evaluaciones nutricionales registradas.</p>
+          <p style="font-size: 14px; color: #999;">Crea la primera evaluación para comenzar el seguimiento.</p>
+        </div>
+      </div>
+
       <!-- Historial de Peso -->
       <div class="modern-card weight-card">
         <div class="card-header-section">
@@ -273,191 +346,250 @@
       </div>
     </div>
 
-    <!-- Modal de edición -->
+    <!-- Modal de edición moderno -->
     <div v-if="mostrarModalEdicion" 
-         style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; overflow-y: auto; padding: 20px;"
+         class="modal-overlay"
          @click.self="cerrarModalEdicion">
-      <div style="background: white; padding: 30px; border-radius: 8px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">
-          <h3 style="margin: 0; color: #ffc107;">✏️ Editar Paciente</h3>
+      <div class="modal-edit-content">
+        <div class="modal-edit-header">
+          <div class="modal-header-icon">✏️</div>
+          <div>
+            <h2 class="modal-edit-title">Editar Información del Paciente</h2>
+            <p class="modal-edit-subtitle">Actualiza los datos del paciente</p>
+          </div>
           <button 
+            type="button"
             @click="cerrarModalEdicion"
-            style="background: none; border: none; font-size: 24px; cursor: pointer; color: #6c757d; padding: 0; width: 30px; height: 30px; line-height: 1;"
+            class="modal-close-btn"
             title="Cerrar"
           >
             ✖
           </button>
         </div>
         
-        <form @submit.prevent="actualizarPaciente">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre *</label>
-              <input 
-                v-model="formEdicion.firstName" 
-                type="text" 
-                required
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
+        <form @submit.prevent="actualizarPaciente" class="modal-edit-form">
+          <!-- Sección: Información Personal -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <span class="form-section-icon">📋</span>
+              <h3 class="form-section-title">Información Personal</h3>
             </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Apellido *</label>
-              <input 
-                v-model="formEdicion.lastName" 
-                type="text" 
-                required
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label">Nombre *</label>
+                <input 
+                  v-model="formEdicion.firstName" 
+                  type="text" 
+                  required
+                  class="form-input"
+                  placeholder="Ingresa el nombre"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Apellido *</label>
+                <input 
+                  v-model="formEdicion.lastName" 
+                  type="text" 
+                  required
+                  class="form-input"
+                  placeholder="Ingresa el apellido"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Fecha de Nacimiento *</label>
+                <input 
+                  v-model="formEdicion.dateOfBirth" 
+                  type="date" 
+                  required
+                  class="form-input"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Género *</label>
+                <select 
+                  v-model="formEdicion.gender" 
+                  required
+                  class="form-input"
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                  <option value="O">Otro</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Email</label>
+                <input 
+                  v-model="formEdicion.email" 
+                  type="email" 
+                  class="form-input"
+                  placeholder="correo@ejemplo.com"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Teléfono</label>
+                <input 
+                  v-model="formEdicion.phone" 
+                  type="tel" 
+                  class="form-input"
+                  placeholder="55 1234 5678"
+                >
+              </div>
             </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Fecha de Nacimiento *</label>
-              <input 
-                v-model="formEdicion.dateOfBirth" 
-                type="date" 
-                required
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
+          </div>
+
+          <!-- Sección: Medidas Físicas -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <span class="form-section-icon">📏</span>
+              <h3 class="form-section-title">Medidas Físicas</h3>
             </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Género *</label>
-              <select 
-                v-model="formEdicion.gender" 
-                required
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
-                <option value="">Seleccionar...</option>
-                <option value="M">Masculino</option>
-                <option value="F">Femenino</option>
-                <option value="O">Otro</option>
-              </select>
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label">Altura (cm) *</label>
+                <input 
+                  v-model.number="formEdicion.height" 
+                  type="number" 
+                  step="0.01"
+                  required
+                  class="form-input"
+                  placeholder="175"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Peso Actual (kg) *</label>
+                <input 
+                  v-model.number="formEdicion.currentWeight" 
+                  type="number" 
+                  step="0.01"
+                  required
+                  class="form-input"
+                  placeholder="70"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Nivel de Actividad</label>
+                <select 
+                  v-model="formEdicion.activityLevel" 
+                  class="form-input"
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="SEDENTARIO">Sedentario</option>
+                  <option value="LIGERO">Actividad Ligera</option>
+                  <option value="MODERADO">Actividad Moderada</option>
+                  <option value="ACTIVO">Activo</option>
+                  <option value="MUY_ACTIVO">Muy Activo</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Altura (cm) *</label>
-              <input 
-                v-model.number="formEdicion.height" 
-                type="number" 
-                step="0.01"
-                required
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
+          </div>
+
+          <!-- Sección: Información Médica -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <span class="form-section-icon">🏥</span>
+              <h3 class="form-section-title">Información Médica</h3>
             </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Peso Actual (kg) *</label>
-              <input 
-                v-model.number="formEdicion.currentWeight" 
-                type="number" 
-                step="0.01"
-                required
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
+            <div class="form-grid-full">
+              <div class="form-field">
+                <label class="form-label">Objetivos de Salud *</label>
+                <select 
+                  v-model="formEdicion.healthGoal" 
+                  required
+                  class="form-input"
+                >
+                  <option value="">Seleccionar objetivo...</option>
+                  <option value="PERDER_PESO">Perder Peso</option>
+                  <option value="GANAR_MASA_MUSCULAR">Ganar Masa Muscular</option>
+                  <option value="MANTENER_PESO">Mantener Peso</option>
+                  <option value="MEJORAR_SALUD">Mejorar Salud General</option>
+                  <option value="CONTROL_DIABETES">Control de Diabetes</option>
+                  <option value="REDUCIR_COLESTEROL">Reducir Colesterol</option>
+                  <option value="DEPORTIVO">Rendimiento Deportivo</option>
+                  <option value="OTRO">Otro</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Condiciones Médicas</label>
+                <textarea 
+                  v-model="formEdicion.medicalConditions" 
+                  rows="3"
+                  class="form-input"
+                  placeholder="Ej: Diabetes tipo 2, hipertensión..."
+                ></textarea>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Alergias</label>
+                <textarea 
+                  v-model="formEdicion.allergies" 
+                  rows="2"
+                  class="form-input"
+                  placeholder="Ej: Nueces, mariscos, lactosa..."
+                ></textarea>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Restricciones Dietéticas</label>
+                <textarea 
+                  v-model="formEdicion.dietaryRestrictions" 
+                  rows="2"
+                  class="form-input"
+                  placeholder="Ej: Vegetariano, bajo en sodio..."
+                ></textarea>
+              </div>
             </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email</label>
-              <input 
-                v-model="formEdicion.email" 
-                type="email" 
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
+          </div>
+
+          <!-- Sección: Contacto de Emergencia -->
+          <div class="form-section">
+            <div class="form-section-header">
+              <span class="form-section-icon">🚨</span>
+              <h3 class="form-section-title">Contacto de Emergencia</h3>
             </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Teléfono</label>
-              <input 
-                v-model="formEdicion.phone" 
-                type="tel" 
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
-            </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nivel de Actividad</label>
-              <select 
-                v-model="formEdicion.activityLevel" 
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
-                <option value="">Seleccionar...</option>
-                <option value="SEDENTARIO">Sedentario</option>
-                <option value="LIGERO">Actividad Ligera</option>
-                <option value="MODERADO">Actividad Moderada</option>
-                <option value="ACTIVO">Activo</option>
-                <option value="MUY_ACTIVO">Muy Activo</option>
-              </select>
-            </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Objetivo de Salud</label>
-              <select 
-                v-model="formEdicion.healthGoal" 
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
-                <option value="">Seleccionar...</option>
-                <option value="LOSE_WEIGHT">Bajar peso</option>
-                <option value="MAINTAIN_WEIGHT">Mantener peso</option>
-                <option value="GAIN_WEIGHT">Subir peso</option>
-                <option value="GAIN_MUSCLE">Ganar músculo</option>
-              </select>
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Condiciones Médicas</label>
-              <textarea 
-                v-model="formEdicion.medicalConditions" 
-                rows="3"
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              ></textarea>
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Alergias</label>
-              <textarea 
-                v-model="formEdicion.allergies" 
-                rows="2"
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              ></textarea>
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Restricciones Dietéticas</label>
-              <textarea 
-                v-model="formEdicion.dietaryRestrictions" 
-                rows="2"
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              ></textarea>
-            </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Contacto de Emergencia - Nombre</label>
-              <input 
-                v-model="formEdicion.emergencyContactName" 
-                type="text" 
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
-            </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: bold;">Contacto de Emergencia - Teléfono</label>
-              <input 
-                v-model="formEdicion.emergencyContactPhone" 
-                type="tel" 
-                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-              >
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label">Nombre del Contacto</label>
+                <input 
+                  v-model="formEdicion.emergencyContactName" 
+                  type="text" 
+                  class="form-input"
+                  placeholder="Nombre completo"
+                >
+              </div>
+              <div class="form-field">
+                <label class="form-label">Teléfono del Contacto</label>
+                <input 
+                  v-model="formEdicion.emergencyContactPhone" 
+                  type="tel" 
+                  class="form-input"
+                  placeholder="55 1234 5678"
+                >
+              </div>
             </div>
           </div>
           
-          <div v-if="errorEdicion" style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-top: 15px;">
-            <strong>Error:</strong> {{ errorEdicion }}
+          <div v-if="errorEdicion" class="alert-error">
+            <strong>⚠️ Error:</strong> {{ errorEdicion }}
           </div>
           
-          <div v-if="exitoEdicion" style="background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-top: 15px;">
-            <strong>¡Éxito!</strong> Paciente actualizado correctamente.
+          <div v-if="exitoEdicion" class="alert-success">
+            <strong>✓ ¡Éxito!</strong> Paciente actualizado correctamente.
           </div>
           
-          <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+          <div class="modal-edit-actions">
             <button 
               type="button"
               @click="cerrarModalEdicion" 
-              style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;"
+              class="btn-modal-cancel"
             >
               Cancelar
             </button>
             <button 
               type="submit"
               :disabled="guardando"
-              style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;"
+              class="btn-modal-submit"
             >
-              {{ guardando ? 'Guardando...' : 'Actualizar Paciente' }}
+              <span v-if="guardando">⏳ Guardando...</span>
+              <span v-else>💾 Actualizar Paciente</span>
             </button>
           </div>
         </form>
@@ -466,7 +598,7 @@
     
     <!-- Botón de volver -->
     <div class="back-button-container">
-      <router-link to="/nutritionist/patients" class="btn-back">
+      <router-link to="/nutriologo/pacientes" class="btn-back">
         <span class="btn-icon">←</span>
         Volver a Pacientes
       </router-link>
@@ -480,11 +612,13 @@ import api from '../../services/api.js'
 import jsPDF from 'jspdf'
 import { generarEncabezadoPDF } from '../../services/pdfService.js'
 import WeightChart from '../../components/WeightChart.vue'
+import NutritionalAssessmentForm from '../../components/NutritionalAssessmentForm.vue'
 
 export default {
   name: 'PatientDetailView',
   components: {
-    WeightChart
+    WeightChart,
+    NutritionalAssessmentForm
   },
   data() {
     return {
@@ -505,6 +639,10 @@ export default {
         recordDate: new Date().toISOString().split('T')[0],
         notes: ''
       },
+      mostrarEvaluacionNutricional: false,
+      assessments: [],
+      latestAssessment: null,
+      loadingAssessments: false,
       formEdicion: {
         firstName: '',
         lastName: '',
@@ -527,6 +665,7 @@ export default {
   mounted() {
     this.cargarPaciente()
     this.cargarRegistrosPeso()
+    this.cargarEvaluaciones()
   },
   methods: {
     async cargarLogo() {
@@ -1314,6 +1453,57 @@ export default {
     
     calcularDiferenciaPeso(pesoActual, pesoAnterior) {
       return pesoActual - pesoAnterior
+    },
+    
+    // Métodos de Evaluación Nutricional
+    async cargarEvaluaciones() {
+      this.loadingAssessments = true
+      try {
+        const patientId = this.$route.params.id
+        const response = await api.get(`/nutritional-assessments/patient/${patientId}/latest`)
+        this.latestAssessment = response.data
+      } catch (error) {
+        if (error.response?.status !== 404) {
+          console.error('Error cargando evaluaciones:', error)
+        }
+      } finally {
+        this.loadingAssessments = false
+      }
+    },
+    
+    toggleEvaluacionNutricional() {
+      this.mostrarEvaluacionNutricional = !this.mostrarEvaluacionNutricional
+    },
+    
+    async onAssessmentSaved() {
+      this.mostrarEvaluacionNutricional = false
+      await this.cargarEvaluaciones()
+      alert('Evaluación guardada correctamente')
+    },
+    
+    verEvaluacionCompleta() {
+      // Aquí podrías abrir un modal con toda la información
+      // Por ahora, simplemente abrimos el formulario en modo edición
+      this.mostrarEvaluacionNutricional = true
+    },
+    
+    getWeightGoalText(goal) {
+      const goals = {
+        'LOSS': 'Pérdida de peso',
+        'GAIN': 'Ganancia de peso',
+        'MAINTENANCE': 'Mantenimiento'
+      }
+      return goals[goal] || 'N/A'
+    },
+    
+    getActivityLevelText(level) {
+      const levels = {
+        'SEDENTARY': 'Sedentario',
+        'LIGHT': 'Ligero',
+        'MODERATE': 'Moderado',
+        'INTENSE': 'Intenso'
+      }
+      return levels[level] || 'N/A'
     }
   }
 }
@@ -1964,5 +2154,403 @@ export default {
     width: 100%;
     justify-content: center;
   }
+}
+
+/* ===== ESTILOS DEL MODAL DE EDICIÓN MODERNO ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-edit-content {
+  background: white;
+  border-radius: 20px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-edit-header {
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  padding: 30px 35px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-radius: 20px 20px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-edit-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.modal-header-icon {
+  font-size: 48px;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.modal-edit-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.modal-edit-subtitle {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 5px 0 0 0;
+}
+
+.modal-close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  margin-left: auto;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.modal-edit-form {
+  padding: 35px;
+}
+
+/* Secciones del formulario */
+.form-section {
+  margin-bottom: 30px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 20px;
+}
+
+.form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.form-section-icon {
+  font-size: 28px;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.form-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+/* Grids del formulario */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-grid-full {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.form-input {
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #8bc34a;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(139, 195, 74, 0.1);
+}
+
+.form-input::placeholder {
+  color: #adb5bd;
+}
+
+/* Alertas */
+.alert-error {
+  background: #fee;
+  color: #c33;
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  border-left: 4px solid #c33;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  border-left: 4px solid #28a745;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Botones del modal */
+.modal-edit-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.btn-modal-cancel {
+  padding: 12px 30px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-modal-cancel:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.btn-modal-submit {
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #8bc34a 0%, #7ab73f 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(139, 195, 74, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-modal-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7ab73f 0%, #6aa62f 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 195, 74, 0.4);
+}
+
+.btn-modal-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsive del modal */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  .modal-edit-content {
+    max-height: 95vh;
+  }
+
+  .modal-edit-header {
+    padding: 20px;
+    flex-wrap: wrap;
+  }
+
+  .modal-header-icon {
+    font-size: 36px;
+  }
+
+  .modal-edit-title {
+    font-size: 22px;
+  }
+
+  .modal-edit-form {
+    padding: 20px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-edit-actions {
+    flex-direction: column;
+  }
+
+  .btn-modal-cancel,
+  .btn-modal-submit {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Estilos para Evaluación Nutricional */
+.assessment-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.btn-assessment {
+  background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-assessment:hover {
+  background: linear-gradient(135deg, #7B1FA2 0%, #6A1B9A 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+}
+
+.assessment-summary {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 15px;
+}
+
+.summary-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.summary-item {
+  background: white;
+  padding: 12px 15px;
+  border-radius: 6px;
+  border-left: 3px solid #9C27B0;
+  font-size: 14px;
+}
+
+.summary-item strong {
+  color: #555;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.btn-view-full {
+  width: 100%;
+  padding: 12px;
+  background: white;
+  border: 2px solid #9C27B0;
+  color: #9C27B0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-view-full:hover {
+  background: #9C27B0;
+  color: white;
 }
 </style>
