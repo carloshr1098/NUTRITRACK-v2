@@ -5,15 +5,15 @@ INSERT INTO roles (name) VALUES ('ROLE_ADMIN');
 INSERT INTO roles (name) VALUES ('ROLE_NUTRIOLOGO');
 INSERT INTO roles (name) VALUES ('ROLE_PACIENTE');
 
--- Usuarios (Contraseñas: admin123, nutri123, paciente123)
+-- Usuarios (Contrasenas: admin123, nutri123, paciente123)
 INSERT INTO users (username, email, password, first_name, last_name) VALUES 
 ('admin', 'admin@nutritrack.com', '$2a$10$PxpWVWfAWnjEncRjrl/5heeAABFpWYLXIbSlvORrdrgmROicSkgre', 'Administrador', 'Sistema');
 
 INSERT INTO users (username, email, password, first_name, last_name, phone, address, degree, university, professional_license) VALUES 
-('nutriologo', 'nutriologo@nutritrack.com', '$2a$10$0fb9lfW/TneSTNOy71GQUubCWpQX/ZBvYfKvcSZJQLLB9CJsxDfSq', 'María', 'González', '5512345678', 'Av. Reforma 123, CDMX', 'Licenciatura en Nutrición', 'Universidad Nacional Autónoma de México', '1234567');
+('nutriologo', 'nutriologo@nutritrack.com', '$2a$10$0fb9lfW/TneSTNOy71GQUubCWpQX/ZBvYfKvcSZJQLLB9CJsxDfSq', 'Maria', 'Gonzalez', '5512345678', 'Av. Reforma 123, CDMX', 'Licenciatura en Nutricion', 'Universidad Nacional Autonoma de Mexico', '1234567');
 
 INSERT INTO users (username, email, password, first_name, last_name) VALUES 
-('paciente', 'paciente@nutritrack.com', '$2a$10$hp7AYXdlOy7JGby9.FvDhufAqioNaprHsQdZOJIvmr8cG2a3m8zc2', 'Juan', 'Pérez');
+('paciente', 'paciente@nutritrack.com', '$2a$10$hp7AYXdlOy7JGby9.FvDhufAqioNaprHsQdZOJIvmr8cG2a3m8zc2', 'Juan', 'Perez');
 
 -- Asignación de roles
 INSERT INTO user_roles (user_id, role_id) VALUES (1, 1);
@@ -22,7 +22,7 @@ INSERT INTO user_roles (user_id, role_id) VALUES (3, 3);
 
 -- Paciente
 INSERT INTO patients (user_id, first_name, last_name, date_of_birth, gender, height, current_weight, activity_level, email, phone, health_goal) VALUES 
-(3, 'Juan', 'Pérez', '1990-05-15', 'Masculino', 175.00, 80.00, 'Moderado', 'paciente@nutritrack.com', '5598765432', 'MAINTAIN_WEIGHT');
+(3, 'Juan', 'Perez', '1990-05-15', 'Masculino', 175.00, 80.00, 'Moderado', 'paciente@nutritrack.com', '5598765432', 'MAINTAIN_WEIGHT');
 
 -- Alimentos
 INSERT INTO foods (name, category, serving_size, calories, protein_grams, carbs_grams, fat_grams, fiber_grams, description) VALUES
