@@ -1,22 +1,22 @@
 -- Datos iniciales para NutriTrack
 
 -- Roles (solo insertar si no existen)
-INSERT INTO roles (name) VALUES ('ROLE_ADMIN') ON CONFLICT DO NOTHING;
-INSERT INTO roles (name) VALUES ('ROLE_NUTRIOLOGO') ON CONFLICT DO NOTHING;
-INSERT INTO roles (name) VALUES ('ROLE_PACIENTE') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_ADMIN') ON CONFLICT (name) DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_NUTRIOLOGO') ON CONFLICT (name) DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_PACIENTE') ON CONFLICT (name) DO NOTHING;
 
 -- Usuarios (Contrasenas: admin123, nutri123, paciente123)
-INSERT INTO users (username, email, password, first_name, last_name) VALUES 
-('admin', 'admin@nutritrack.com', '$2a$10$PxpWVWfAWnjEncRjrl/5heeAABFpWYLXIbSlvORrdrgmROicSkgre', 'Administrador', 'Sistema')
-ON CONFLICT (username) DO NOTHING;
+INSERT INTO users (username, email, password, first_name, last_name) 
+SELECT 'admin', 'admin@nutritrack.com', '$2a$10$PxpWVWfAWnjEncRjrl/5heeAABFpWYLXIbSlvORrdrgmROicSkgre', 'Administrador', 'Sistema'
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
 
-INSERT INTO users (username, email, password, first_name, last_name, phone, address, degree, university, professional_license) VALUES 
-('nutriologo', 'nutriologo@nutritrack.com', '$2a$10$0fb9lfW/TneSTNOy71GQUubCWpQX/ZBvYfKvcSZJQLLB9CJsxDfSq', 'Maria', 'Gonzalez', '5512345678', 'Av. Reforma 123, CDMX', 'Licenciatura en Nutricion', 'Universidad Nacional Autonoma de Mexico', '1234567')
-ON CONFLICT (username) DO NOTHING;
+INSERT INTO users (username, email, password, first_name, last_name, phone, address, degree, university, professional_license)
+SELECT 'nutriologo', 'nutriologo@nutritrack.com', '$2a$10$0fb9lfW/TneSTNOy71GQUubCWpQX/ZBvYfKvcSZJQLLB9CJsxDfSq', 'Maria', 'Gonzalez', '5512345678', 'Av. Reforma 123, CDMX', 'Licenciatura en Nutricion', 'Universidad Nacional Autonoma de Mexico', '1234567'
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'nutriologo');
 
-INSERT INTO users (username, email, password, first_name, last_name) VALUES 
-('paciente', 'paciente@nutritrack.com', '$2a$10$hp7AYXdlOy7JGby9.FvDhufAqioNaprHsQdZOJIvmr8cG2a3m8zc2', 'Juan', 'Perez')
-ON CONFLICT (username) DO NOTHING;
+INSERT INTO users (username, email, password, first_name, last_name)
+SELECT 'paciente', 'paciente@nutritrack.com', '$2a$10$hp7AYXdlOy7JGby9.FvDhufAqioNaprHsQdZOJIvmr8cG2a3m8zc2', 'Juan', 'Perez'
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'paciente');
 
 -- Asignación de roles (solo si no existen)
 INSERT INTO user_roles (user_id, role_id) 
@@ -283,8 +283,9 @@ INSERT INTO foods (name, category, serving_size, calories, protein_grams, carbs_
 ('Quest Bar Chocolate Chip Cookie Dough', 'Suplementos', '1 barra (60g)', 200, 21.0, 22.0, 9.0, 14.0, 'Barra proteica Quest - Cookie dough'),
 ('Quest Bar Cookies and Cream', 'Suplementos', '1 barra (60g)', 190, 21.0, 21.0, 9.0, 15.0, 'Barra proteica Quest - Cookies & cream'),
 ('RX Bar Chocolate Sea Salt', 'Suplementos', '1 barra (52g)', 210, 12.0, 24.0, 9.0, 5.0, 'Barra proteica natural - Chocolate'),
-('Kind Protein Bar', 'Suplementos', '1 barra (50g)', 250, 12.0, 17.0, 16.0, 6.0, 'Barra proteica con nueces')
-ON CONFLICT (name) DO NOTHING;
+('Kind Protein Bar', 'Suplementos', '1 barra (50g)', 250, 12.0, 17.0, 16.0, 6.0, 'Barra proteica con nueces');
+-- Los alimentos se insertan directamente ya que no hay constraint UNIQUE en name
+-- Si hay duplicados, spring.sql.init.continue-on-error=true los ignorará
 -- ============================================================================
 -- SCRIPT PARA INSERTAR 10 PACIENTES CON DATOS COMPLETOS
 -- ============================================================================
