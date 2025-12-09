@@ -1,30 +1,40 @@
 -- Datos iniciales para NutriTrack
 
--- Roles
-INSERT INTO roles (name) VALUES ('ROLE_ADMIN');
-INSERT INTO roles (name) VALUES ('ROLE_NUTRIOLOGO');
-INSERT INTO roles (name) VALUES ('ROLE_PACIENTE');
+-- Roles (solo insertar si no existen)
+INSERT INTO roles (name) VALUES ('ROLE_ADMIN') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_NUTRIOLOGO') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_PACIENTE') ON CONFLICT DO NOTHING;
 
 -- Usuarios (Contrasenas: admin123, nutri123, paciente123)
 INSERT INTO users (username, email, password, first_name, last_name) VALUES 
-('admin', 'admin@nutritrack.com', '$2a$10$PxpWVWfAWnjEncRjrl/5heeAABFpWYLXIbSlvORrdrgmROicSkgre', 'Administrador', 'Sistema');
+('admin', 'admin@nutritrack.com', '$2a$10$PxpWVWfAWnjEncRjrl/5heeAABFpWYLXIbSlvORrdrgmROicSkgre', 'Administrador', 'Sistema')
+ON CONFLICT (username) DO NOTHING;
 
 INSERT INTO users (username, email, password, first_name, last_name, phone, address, degree, university, professional_license) VALUES 
-('nutriologo', 'nutriologo@nutritrack.com', '$2a$10$0fb9lfW/TneSTNOy71GQUubCWpQX/ZBvYfKvcSZJQLLB9CJsxDfSq', 'Maria', 'Gonzalez', '5512345678', 'Av. Reforma 123, CDMX', 'Licenciatura en Nutricion', 'Universidad Nacional Autonoma de Mexico', '1234567');
+('nutriologo', 'nutriologo@nutritrack.com', '$2a$10$0fb9lfW/TneSTNOy71GQUubCWpQX/ZBvYfKvcSZJQLLB9CJsxDfSq', 'Maria', 'Gonzalez', '5512345678', 'Av. Reforma 123, CDMX', 'Licenciatura en Nutricion', 'Universidad Nacional Autonoma de Mexico', '1234567')
+ON CONFLICT (username) DO NOTHING;
 
 INSERT INTO users (username, email, password, first_name, last_name) VALUES 
-('paciente', 'paciente@nutritrack.com', '$2a$10$hp7AYXdlOy7JGby9.FvDhufAqioNaprHsQdZOJIvmr8cG2a3m8zc2', 'Juan', 'Perez');
+('paciente', 'paciente@nutritrack.com', '$2a$10$hp7AYXdlOy7JGby9.FvDhufAqioNaprHsQdZOJIvmr8cG2a3m8zc2', 'Juan', 'Perez')
+ON CONFLICT (username) DO NOTHING;
 
--- Asignación de roles
-INSERT INTO user_roles (user_id, role_id) VALUES (1, 1);
-INSERT INTO user_roles (user_id, role_id) VALUES (2, 2);
-INSERT INTO user_roles (user_id, role_id) VALUES (3, 3);
+-- Asignación de roles (solo si no existen)
+INSERT INTO user_roles (user_id, role_id) 
+SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = 1 AND role_id = 1);
 
--- Paciente
-INSERT INTO patients (user_id, first_name, last_name, date_of_birth, gender, height, current_weight, activity_level, email, phone, health_goal) VALUES 
-(3, 'Juan', 'Perez', '1990-05-15', 'Masculino', 175.00, 80.00, 'Moderado', 'paciente@nutritrack.com', '5598765432', 'MAINTAIN_WEIGHT');
+INSERT INTO user_roles (user_id, role_id) 
+SELECT 2, 2 WHERE NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = 2 AND role_id = 2);
 
--- Alimentos
+INSERT INTO user_roles (user_id, role_id) 
+SELECT 3, 3 WHERE NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = 3 AND role_id = 3);
+
+-- Paciente (solo si no existe)
+INSERT INTO patients (user_id, first_name, last_name, date_of_birth, gender, height, current_weight, activity_level, email, phone, health_goal) 
+SELECT 3, 'Juan', 'Perez', '1990-05-15', 'Masculino', 175.00, 80.00, 'Moderado', 'paciente@nutritrack.com', '5598765432', 'MAINTAIN_WEIGHT'
+WHERE NOT EXISTS (SELECT 1 FROM patients WHERE user_id = 3);
+
+-- Alimentos (solo insertar si no existen)
+-- Se usa ON CONFLICT DO NOTHING para evitar duplicados si el script se ejecuta múltiples veces
 INSERT INTO foods (name, category, serving_size, calories, protein_grams, carbs_grams, fat_grams, fiber_grams, description) VALUES
 ('Pechuga de pollo', 'Carnes', '100g', 165, 31.0, 0.0, 3.6, 0.0, 'Pechuga de pollo sin piel cocida'),
 ('Arroz integral', 'Cereales', '100g', 111, 2.6, 23.0, 0.9, 1.8, 'Arroz integral cocido'),
@@ -273,7 +283,8 @@ INSERT INTO foods (name, category, serving_size, calories, protein_grams, carbs_
 ('Quest Bar Chocolate Chip Cookie Dough', 'Suplementos', '1 barra (60g)', 200, 21.0, 22.0, 9.0, 14.0, 'Barra proteica Quest - Cookie dough'),
 ('Quest Bar Cookies and Cream', 'Suplementos', '1 barra (60g)', 190, 21.0, 21.0, 9.0, 15.0, 'Barra proteica Quest - Cookies & cream'),
 ('RX Bar Chocolate Sea Salt', 'Suplementos', '1 barra (52g)', 210, 12.0, 24.0, 9.0, 5.0, 'Barra proteica natural - Chocolate'),
-('Kind Protein Bar', 'Suplementos', '1 barra (50g)', 250, 12.0, 17.0, 16.0, 6.0, 'Barra proteica con nueces');
+('Kind Protein Bar', 'Suplementos', '1 barra (50g)', 250, 12.0, 17.0, 16.0, 6.0, 'Barra proteica con nueces')
+ON CONFLICT (name) DO NOTHING;
 -- ============================================================================
 -- SCRIPT PARA INSERTAR 10 PACIENTES CON DATOS COMPLETOS
 -- ============================================================================
