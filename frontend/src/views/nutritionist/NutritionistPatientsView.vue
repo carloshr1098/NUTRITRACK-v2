@@ -438,7 +438,7 @@
     </div>
     
     <div class="back-button-container">
-      <router-link to="/dashboard" class="btn-back">
+      <router-link to="/" class="btn-back">
         <span class="btn-icon">←</span>
         Volver al Dashboard
       </router-link>
