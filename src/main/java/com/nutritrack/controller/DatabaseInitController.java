@@ -8,15 +8,21 @@ import com.nutritrack.repository.RoleRepository;
 import com.nutritrack.repository.UserRepository;
 import com.nutritrack.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/init")
@@ -34,6 +40,9 @@ public class DatabaseInitController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @PostMapping("/database")
     public ResponseEntity<?> initializeDatabase() {
@@ -123,5 +132,45 @@ public class DatabaseInitController {
         boolean initialized = userCount > 0;
         
         return ResponseEntity.ok().body("{\"initialized\": " + initialized + ", \"users\": " + userCount + ", \"patients\": " + patientCount + "}");
+    }
+
+    @PostMapping("/load-data")
+    public ResponseEntity<?> loadDataSql() {
+        try {
+            // Load data.sql from resources
+            ClassPathResource resource = new ClassPathResource("data.sql");
+            
+            if (!resource.exists()) {
+                return ResponseEntity.status(404).body("{\"error\": \"data.sql not found\"}");
+            }
+            
+            // Read the SQL file
+            String sql;
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+                sql = reader.lines().collect(Collectors.joining("\n"));
+            }
+            
+            // Split by semicolon and execute each statement
+            String[] statements = sql.split(";");
+            int executed = 0;
+            
+            for (String statement : statements) {
+                statement = statement.trim();
+                if (!statement.isEmpty() && !statement.startsWith("--")) {
+                    try {
+                        jdbcTemplate.execute(statement);
+                        executed++;
+                    } catch (Exception e) {
+                        // Continue even if some statements fail (e.g., duplicates)
+                        System.out.println("Skipped statement: " + e.getMessage());
+                    }
+                }
+            }
+            
+            return ResponseEntity.ok().body("{\"message\": \"Data loaded successfully\", \"statements\": " + executed + "}");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\": \"" + e.getMessage() + "\"}");
+        }
     }
 }
