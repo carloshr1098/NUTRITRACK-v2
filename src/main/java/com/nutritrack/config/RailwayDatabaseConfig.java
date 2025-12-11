@@ -1,7 +1,7 @@
 package com.nutritrack.config;
 
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -19,34 +19,28 @@ public class RailwayDatabaseConfig {
 
     @Bean
     @Primary
-    @ConfigurationProperties("spring.datasource")
-    public DataSourceProperties dataSourceProperties() {
-        DataSourceProperties properties = new DataSourceProperties();
-        
+    public DataSource dataSource() {
         // Get DATABASE_URL from environment
         String databaseUrl = System.getenv("DATABASE_URL");
         
-        if (databaseUrl != null && !databaseUrl.isEmpty()) {
-            // Convert postgresql:// to jdbc:postgresql://
-            if (databaseUrl.startsWith("postgresql://")) {
-                databaseUrl = "jdbc:" + databaseUrl;
-            }
-            
-            System.out.println("=== RAILWAY DATABASE CONFIG ===");
-            System.out.println("Original URL: " + System.getenv("DATABASE_URL"));
-            System.out.println("Converted URL: " + databaseUrl);
-            System.out.println("===============================");
-            
-            properties.setUrl(databaseUrl);
-            properties.setDriverClassName("org.postgresql.Driver");
+        if (databaseUrl == null || databaseUrl.isEmpty()) {
+            throw new IllegalStateException("DATABASE_URL environment variable is not set");
         }
         
-        return properties;
-    }
-
-    @Bean
-    @Primary
-    public DataSource dataSource(DataSourceProperties properties) {
-        return properties.initializeDataSourceBuilder().build();
+        // Convert postgresql:// to jdbc:postgresql://
+        if (databaseUrl.startsWith("postgresql://")) {
+            databaseUrl = "jdbc:" + databaseUrl;
+        }
+        
+        System.out.println("=== RAILWAY DATABASE CONFIG ===");
+        System.out.println("Original URL: " + System.getenv("DATABASE_URL"));
+        System.out.println("Converted URL: " + databaseUrl);
+        System.out.println("===============================");
+        
+        return DataSourceBuilder
+                .create()
+                .url(databaseUrl)
+                .driverClassName("org.postgresql.Driver")
+                .build();
     }
 }
