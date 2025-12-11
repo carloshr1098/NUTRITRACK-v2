@@ -144,32 +144,41 @@ public class DatabaseInitController {
                 return ResponseEntity.status(404).body("{\"error\": \"data.sql not found\"}");
             }
             
-            // Read the SQL file
+            // Read the entire SQL file
             String sql;
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
                 sql = reader.lines().collect(Collectors.joining("\n"));
             }
             
-            // Split by semicolon and execute each statement
+            // Remove comments
+            sql = sql.replaceAll("--[^\n]*\n", "\n");
+            
+            // Split by semicolon but keep multi-line statements together
             String[] statements = sql.split(";");
             int executed = 0;
+            int skipped = 0;
             
             for (String statement : statements) {
                 statement = statement.trim();
-                if (!statement.isEmpty() && !statement.startsWith("--")) {
+                if (!statement.isEmpty()) {
                     try {
                         jdbcTemplate.execute(statement);
                         executed++;
                     } catch (Exception e) {
                         // Continue even if some statements fail (e.g., duplicates)
-                        System.out.println("Skipped statement: " + e.getMessage());
+                        skipped++;
                     }
                 }
             }
             
-            return ResponseEntity.ok().body("{\"message\": \"Data loaded successfully\", \"statements\": " + executed + "}");
+            // Get final counts
+            long userCount = userRepository.count();
+            long patientCount = patientRepository.count();
+            
+            return ResponseEntity.ok().body("{\"message\": \"Data loaded successfully\", \"executed\": " + executed + ", \"skipped\": " + skipped + ", \"users\": " + userCount + ", \"patients\": " + patientCount + "}");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body("{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
